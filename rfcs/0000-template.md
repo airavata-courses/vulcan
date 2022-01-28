@@ -9,7 +9,7 @@ Brief explanation of the feature.
 # Basic example
 
 Include a basic code example/link to an existing proof-of-concept, if applicable.
-The could demonstrate installation/usage of the new feature with other
+This could demonstrate installation/usage of the new feature with other
 service components.
 
 # Motivation

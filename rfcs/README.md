@@ -21,7 +21,7 @@ An RFC goes through the following stages:
 - **Landed:** when an RFC's proposed changes are shipped in an actual release.
 - **Rejected:** when an RFC PR is closed without being merged.
 
-[Pending RFC List](https://github.com/airavata-courses/vulcan/pulls?q=is%3Aopen+is%3Apr+label%3ARFC)
+[Pending RFC List](https://github.com/airavata-courses/vulcan/labels/RFC%20Pending)
 
 ## When to follow this process
 
@@ -33,7 +33,7 @@ A "significant" update is loosely defined, but may include the following:
 
 Some changes do not require an RFC:
 
-- Additions that strictly improve objective, numerical quality criteria (speedup,better runtime support)
+- Additions that strictly improve objective, numerical quality criteria (speedup, better runtime support)
 - Fixing objectively incorrect behavior
 - Rephrasing, reorganizing or refactoring
 - Addition or removal of warnings
@@ -44,7 +44,7 @@ submit an RFC first.
 
 ## Why to follow this process
 Typically, an RFC process is used to reach a consensus among development teams and 
-other stakeholders. However, our intentionbehind this process is focused on bringing 
+other stakeholders. However, our intention behind this process is focused on bringing 
 transparency in the formulation of feature design. The goal is not to emphasize on writing
 highly formal specification documents that may constrain development time, but rather 
 facilitate an open exchange of ideas through channels such as GitHub Issues, Discussions 
@@ -61,8 +61,8 @@ familiarity with the implementation.
 ## What the process is
 
 In short, to make any major updates, one must first get the
-RFC merged into the RFC repo as a markdown file. At that point the RFC
-is 'active' and may be implemented by one of the core members.
+RFC merged into the RFC directory as a markdown file. At that point the RFC
+is 'active' and may be implemented by one of the members.
 
 1. Create a new issue referencing the proposed feature. Assign the appropriate ongoing project (or leave empty if unknown).
 
@@ -74,15 +74,15 @@ is 'active' and may be implemented by one of the core members.
 
 2.  (Optional) Open a new thread in [Discussions](https://github.com/airavata-courses/vulcan/discussions) and make sure to set the category to "RFC Discussions".
 
-    - This is useful if you believe an idea is too abstract and requires input from other members before drafting. Otherwise, such discussions would be part of the issue referenced by RFC.
+    - This is useful if you believe an idea is too abstract and requires input from other members before drafting. Otherwise, such discussions would be part of the issue referenced by the RFC.
 
-3.  Work on a draft proposal in a Markdown file based on the template (`0000-template.md`) found in this repo.
+3.  Work on a draft proposal in a Markdown file based on the template (`0000-template.md`) found in this directory.
 
 4.  If you believe your proposal has enough information for review:
 
     - Fork this repo.
 
-    - Create your proposal as `active-rfcs/0000-my-feature.md` (where "my-feature" is descriptive. don't assign an RFC number yet).
+    - Create your proposal as `active-rfcs/0000-my-feature.md` (where "my-feature" is descriptive. Don't assign an RFC number yet).
 
     - Submit a pull request. Link the discussion thread, if applicable.
 
@@ -92,7 +92,7 @@ is 'active' and may be implemented by one of the core members.
 
     - An RFC may be rejected after a discussion has settled and a rationale is provided for rejection. A member of the [core team] should then close the RFC's associated pull request.
 
-    - An RFC may be accepted if the requirements/use-cases are handled adequately. A [core team] member will merge the RFC's associated pull request, at which point the RFC will become 'active'.
+    - An RFC may be accepted if the requirements/use cases are handled adequately. A [core team] member will merge the RFC's associated pull request, at which point the RFC will become 'active'.
 
 ## Details on Active RFCs
 
@@ -113,7 +113,7 @@ implementation for review after the RFC has been accepted.
 
 An active RFC should have the link to the implementation PR listed if there is one. Feedback to the actual implementation should be conducted in the implementation PR instead of the original RFC PR.
 
-## Reviewing RFC's
+## Reviewing RFCs
 
 Members of the [core team] will review open RFC pull requests on a regular basis. If a core team member believes an RFC PR is ready to be accepted into active status, they can approve the PR using GitHub's review feature to signal their approval of the RFC.
 
