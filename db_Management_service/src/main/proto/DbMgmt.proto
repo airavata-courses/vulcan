@@ -1,0 +1,13 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.WeatherForcast.DbMgmtService.grpc;
+
+message UrlRequest {
+  string url = 1;
+}
+message UrlResponse {
+  int32 id = 1;
+}
+service DbMgmtService {
+  rpc saveurl(UrlRequest) returns (UrlResponse);
+}
