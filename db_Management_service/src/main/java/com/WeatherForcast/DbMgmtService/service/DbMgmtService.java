@@ -5,6 +5,8 @@ import com.WeatherForcast.DbMgmtService.repository.UrlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class DbMgmtService {
 
@@ -13,7 +15,10 @@ public class DbMgmtService {
 
     //service to save the given url with an auto-generated id
     public UrlModel saveUrl(UrlModel urlModel){
-        return this.repository.save(urlModel);
+        //check if the data is already available in the database
+        List<UrlModel> modelList = this.repository.findByUrl(urlModel.getUrl());
+
+        return modelList.isEmpty() ? this.repository.save(urlModel) : modelList.get(0);
     }
 
     //service that returns the url for the given id
