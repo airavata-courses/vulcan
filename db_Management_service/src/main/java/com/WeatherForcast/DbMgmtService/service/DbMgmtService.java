@@ -11,7 +11,13 @@ public class DbMgmtService {
     @Autowired
     private UrlRepository repository;
 
+    //service to save the given url with an auto-generated id
     public UrlModel saveUrl(UrlModel urlModel){
         return this.repository.save(urlModel);
+    }
+
+    //service that returns the url for the given id
+    public String getUrl(Integer id){
+        return this.repository.getById(id).getUrl();
     }
 }
