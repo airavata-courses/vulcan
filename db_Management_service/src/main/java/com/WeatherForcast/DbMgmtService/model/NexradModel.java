@@ -13,14 +13,12 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name ="TBL_URL")
-public class UrlModel {
-    public UrlModel(String url) {
-        this.url = url;
-    }
-
-    @Id
-    @GeneratedValue
-    private int id;
+@Table(name ="TBL_NEXRAD")
+public class NexradModel extends BaseModel{
+    public String date;
+    public String month;
+    public String year;
+    public String station;
+    public String time;
     private String url;
 }

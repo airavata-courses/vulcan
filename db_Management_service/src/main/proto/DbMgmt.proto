@@ -3,7 +3,12 @@ option java_multiple_files = true;
 package com.WeatherForcast.DbMgmtService.grpc;
 
 message msgUrl {
-  string url = 1;
+  string date = 1;
+  string month = 2;
+  string year = 3;
+  string station = 4;
+  string time = 5;
+  string url = 6;
 }
 message msgId {
   int32 id = 1;
