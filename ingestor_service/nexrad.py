@@ -2,16 +2,17 @@ import grpc
 import ingestor_pb2_grpc
 import ingestor_pb2
 import nexradaws
+from flask import current_app
 
 class NexRad:
-    def __init__(self, grpc_server, grpc_server_port, date, month, year, station, time) -> None:
-        self.grpc_server = grpc_server
-        self.grpc_server_port = grpc_server_port
-        self.date = date
-        self.month = month
-        self.year = year
-        self.station = station
-        self.time = time
+    def __init__(self, data) -> None:
+        self.grpc_server = current_app.config["GRPC_SERVER"]
+        self.grpc_server_port = current_app.config["GRPC_SERVER_PORT"]
+        self.date = data['date']
+        self.month = data['month']
+        self.year = data['year']
+        self.station = data['station']
+        self.time = data['time']
     
     #if there are radar scans available for the given date and station return true
     def validate(self):
