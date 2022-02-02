@@ -2,6 +2,7 @@ import grpc
 import ingestor_pb2_grpc
 import ingestor_pb2
 import nexradaws
+from google.protobuf.json_format import MessageToJson
 from flask import current_app
 
 class NexRad:
@@ -17,8 +18,12 @@ class NexRad:
     #if there are radar scans available for the given date and station return true
     def validate(self):
         conn = nexradaws.NexradAwsInterface()
-        scans = conn.get_avail_scans(self.year, self.month, self.date, self.station)
-        return len(scans) != 0
+        try:
+            scans = conn.get_avail_scans(self.year, self.month, self.date, self.station)
+            return len(scans) != 0
+        except:
+            print('invalid user input')
+            return False
     
     def frameUrl(self):
         return f'{self.year}/{self.month}/{self.date}/{self.station}'
@@ -28,7 +33,7 @@ class NexRad:
         server_url = f'{self.grpc_server}:{self.grpc_server_port}'
         channel = grpc.insecure_channel(server_url)
         stub = ingestor_pb2_grpc.DbMgmtServiceStub(channel)
-        return stub.saveurl(ingestor_pb2.msgUrl(
+        message =  stub.saveurl(ingestor_pb2.msgUrl(
             date = self.date, 
             month = self.month, 
             year = self.year, 
@@ -36,4 +41,5 @@ class NexRad:
             time = self.time, 
             url = self.frameUrl()
             ))
+        return MessageToJson(message)
 
