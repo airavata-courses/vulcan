@@ -9,7 +9,8 @@ const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
 const methodOverride = require('method-override')
-
+const server = require('http').createServer(app);
+const WebSocket = require('ws');
 const initializePassport = require('./passport-config')
 initializePassport(
   passport,
@@ -17,8 +18,9 @@ initializePassport(
   id => users.find(user => user.id === id)
 )
 
-
 const users = []
+
+const wss = new WebSocket.Server({server});
 
 app.set('view-engine', 'ejs')
 app.use(express.urlencoded({ extended: false }))
@@ -32,9 +34,23 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(methodOverride('_method'))
 
-app.get('/', checkAuthenticated, (req, res) => {
-  res.render('index.ejs', { name: req.user.name })
-})
+wss.on('connection', function connection(ws){
+  console.log('A new client Connection!')
+  ws.send('Welcome new Client');
+
+  ws.on('message', function incoming(message){
+    console.log('received: %s', message);
+    ws.send('Got your message its :' + message)
+  });
+});
+
+app.get('/', (req, res) => res.send('Hello World!'))
+
+server.listen(3000, () => console.log('Listenining on port : 3000'))
+
+// app.get('/', checkAuthenticated, (req, res) => {
+//   res.render('index.ejs', { name: req.user.name })
+// })
 
 app.get('/login', checkNotAuthenticated, (req, res) => {
   res.render('login.ejs')
@@ -85,4 +101,4 @@ function checkNotAuthenticated(req, res, next) {
   next()
 }
 
-app.listen(3000)
+// app.listen(3000)

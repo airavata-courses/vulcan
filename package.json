@@ -17,12 +17,11 @@
     "kafkajs": "^1.15.0",
     "method-override": "^3.0.0",
     "passport": "^0.4.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "ws": "^8.4.2"
   },
   "devDependencies": {
     "dotenv": "^8.6.0",
     "nodemon": "^2.0.15"
   }
 }
-
-

@@ -10,7 +10,6 @@ async function run() {
   const consumer = kafka.consumer({ groupId: "" + Date.now() });
 
   await consumer.connect();
-  
 
   await consumer.subscribe({ topic: "quickstart", fromBeginning: true });
   await consumer.run({ 
