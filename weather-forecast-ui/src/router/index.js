@@ -11,6 +11,16 @@ const routes = [
     component: Forecast,
     auth: true,
   },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue'),
+  },
+  {
+    path: '/register',
+    name: 'Registration',
+    component: () => import(/* webpackChunkName: "register" */ '../views/Registration.vue'),
+  },
 ];
 
 const router = new VueRouter({
