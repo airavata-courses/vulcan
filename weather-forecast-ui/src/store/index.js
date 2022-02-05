@@ -11,20 +11,30 @@ export default new Vuex.Store({
       lastName: null,
       email: null,
     },
+    isSessionActive: false,
   },
   mutations: {
     setAccessToken(ctx, accessToken) {
       api.interceptors.request.use(
-        async (config) => {
+        (config) => {
           config.headers = {
             Authorization: `Bearer ${accessToken}`,
             Accept: 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded',
           };
+          ctx.isSessionActive = true;
           return config;
         },
         Promise.reject,
       );
+    },
+
+    setUserDetails(ctx, { firstName, lastName, email }) {
+      Object.assign(ctx.user, {
+        firstName,
+        lastName,
+        email,
+      });
     },
   },
   actions: {
@@ -33,7 +43,9 @@ export default new Vuex.Store({
         username,
         password,
       });
-      ctx.commit('setAccessToken', data.token);
+      const { token, ...userDetails } = data;
+      ctx.commit('setAccessToken', token);
+      ctx.commit('setUserDetails', userDetails);
     },
 
     async createAccount(ctx, {
@@ -42,7 +54,7 @@ export default new Vuex.Store({
       return api.post('/register', {
         firstName,
         lastName,
-        username,
+        email: username,
         password,
       });
     },
