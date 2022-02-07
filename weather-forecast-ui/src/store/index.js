@@ -11,7 +11,7 @@ export default new Vuex.Store({
       lastName: null,
       email: null,
     },
-    isSessionActive: false,
+    isSessionActive: true,
   },
   mutations: {
     setAccessToken(ctx, accessToken) {
@@ -43,9 +43,9 @@ export default new Vuex.Store({
         username,
         password,
       });
-      const { token, ...userDetails } = data;
+      const { token, ...user } = data;
       ctx.commit('setAccessToken', token);
-      ctx.commit('setUserDetails', userDetails);
+      ctx.commit('setUserDetails', user);
     },
 
     async createAccount(ctx, {
@@ -64,6 +64,7 @@ export default new Vuex.Store({
       month,
       day,
       coords,
+      onMessage,
     }) {
       const message = JSON.stringify({
         year,
@@ -71,10 +72,19 @@ export default new Vuex.Store({
         day,
         coords,
       });
-      console.log(message);
+      console.info(message);
       const ws = new WebSocket(process.env.VUE_APP_WS_BASE_URL);
-      ws.send(message);
-      return ws;
+      ws.onmessage = (event) => {
+        onMessage(event.data);
+        ws.close();
+      };
+      return new Promise((resolve, reject) => {
+        ws.onopen = (event) => {
+          ws.send(message);
+          resolve(event.data);
+        };
+        ws.onerror = (event) => reject(event.data);
+      });
     },
   },
 });

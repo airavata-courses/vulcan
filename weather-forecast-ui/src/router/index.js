@@ -33,7 +33,6 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  console.log(to, from);
   if (to.matched.some((record) => record.meta.requireAuth)) {
     if (store.state.isSessionActive) {
       next();

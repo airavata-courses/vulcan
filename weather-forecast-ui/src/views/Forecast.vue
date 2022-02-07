@@ -69,6 +69,7 @@ import { mapActions } from 'vuex';
 import InteractiveMap from '../components/InteractiveMap.vue';
 import TimeSlider from '../components/TimeSlider.vue';
 import { CityNames, MapCenter } from '../constants/forecast';
+import sampleGeoJson from '../constants/sampleGeoJson.json';
 
 export default {
   name: 'Forecast',
@@ -81,7 +82,7 @@ export default {
       dateMenu: false,
       selectedDate: new Date().toISOString().slice(0, 10),
       mapCenter: JSON.stringify(MapCenter.BL),
-      mapLayer: [],
+      mapLayer: sampleGeoJson,
       locations: Object.entries(MapCenter)
         .map(([place, coords]) => ({ place: CityNames[place], coords: JSON.stringify(coords) }))
         .sort((a, b) => a.place.localeCompare(b.place)),
@@ -95,23 +96,23 @@ export default {
       try {
         const [year, month, day] = this.selectedDate.split('-');
         const coords = JSON.parse(this.mapCenter);
-        const ws = await this.fetchWeatherData({
+        await this.fetchWeatherData({
           year,
           month,
           day,
           coords,
+          onMessage: this.updateMapLayer,
         });
-        this.loading = false;
-        ws.onMessage(this.updateMapLayer);
-        ws.close();
       } catch (err) {
         console.error(err);
+        this.loading = false;
       }
-      this.loading = false;
     },
     updateMapLayer(message) {
-      const values = JSON.parse(message);
-      this.mapLayer.splice(0, this.mapLayer.length, ...values);
+      this.loading = false;
+      const geoJson = JSON.parse(message);
+      console.info(geoJson);
+      Object.assign(this.mapLayer, geoJson);
     },
   },
   filters: {
