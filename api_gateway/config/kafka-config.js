@@ -21,25 +21,3 @@ producer = new Producer(client)
 
 module.exports = { producer, consumer };
 
-// consumer = new Consumer(
-//     client,
-//     [{ topic: config.kafkaTopics.consumers.apiConsumer }],
-//     {
-//       autoCommit: true,
-//       encoding: 'utf8',
-//       groupId: 'api-gateway'
-//     }
-//   )
-
-// const consumerOptions = {
-//   kafkaHost: 'kafka-service:9092',
-//   autoCommit: true,
-//   encoding: "utf8",
-//   groupId: "api-gateway",
-//   protocol: ["roundrobin"],
-//   fromOffset: "latest"
-// };
-// const consumer = new ConsumerGroup(
-//   consumerOptions,
-//   "sessionManagementConsumerF"
-// );

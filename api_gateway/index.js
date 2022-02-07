@@ -8,7 +8,6 @@ require('./passport')
 const app = express()
 const server = require('http').createServer(app);
 const WebSocket = require('ws');
-// let config = require("./config/config");
 const wss = new WebSocket.Server({server});
 
 genToken = user => {
@@ -100,6 +99,7 @@ app.post('/login',passport.authenticate('jwt',{session:false}), (req, res, next)
   if (foundUser) {
     return res.status(200).json("Login Succesful");
   }
+  return res.status(403).json("Invalid User Name")
 })
 
 app.get('/secret', passport.authenticate('jwt',{session: false}),(req,res,next)=>{
@@ -107,9 +107,9 @@ app.get('/secret', passport.authenticate('jwt',{session: false}),(req,res,next)=
 })
 
 
+server.listen(3000, () => console.log('Listenining on port : 3000'))
 
+// let config = require("./config/config");
 // app.listen(8000,()=>{
 //   console.log('Server is up and running at the port 8000')
 // })
-
-server.listen(3000, () => console.log('Listenining on port : 3000'))
