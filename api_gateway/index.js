@@ -47,7 +47,7 @@ wss.on('connection', function connection(ws){
 
     let payloads = [
       {
-        topic : "test2",
+        topic : "gateway",
         messages : msg
       }];
     
