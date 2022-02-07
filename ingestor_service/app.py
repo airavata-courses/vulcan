@@ -21,7 +21,9 @@ def saveurl(data):
 
             print(f'Message returned from db management service - {message}')
 
-            status = producer(topic='KAFKA_STORM_DETECTION_TOPIC').produce(message)
+            output = [data["coords"]]
+
+            status = producer(topic='KAFKA_STORM_DETECTION_TOPIC').produce(json.dumps(output))
             print(status)
         else:
             print("fail")

@@ -12,8 +12,10 @@ class NexRad:
         self.date = data['date']
         self.month = data['month']
         self.year = data['year']
-        self.station = data['station']
-        self.time = data['time']
+        # self.station = data['station']
+        # self.time = data['time']
+        self.station = "KCCX"
+        self.time = "12PM"
     
     #if there are radar scans available for the given date and station return true
     def validate(self):
