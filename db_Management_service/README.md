@@ -22,12 +22,9 @@
                 
                 docker-compose up -d
                 
-2. Then run the following command to build the jar file
+2. Then run the script file run.sh as
 
-                ./mvwn clean install
+                sh run.sh
 
-3. To run the application
-
-                java -jar ./target/DbMgmtService-0.0.1-SNAPSHOT.jar
+The application will now be build and hosted.
                 
-4. The application is now hosted on port 8051.            
