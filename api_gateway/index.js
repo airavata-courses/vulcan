@@ -81,7 +81,7 @@ mongoose.connection.once('open', function () {
 })
 
 
-app.post('/login', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+app.post('/login', async (req, res, next) => {
   const { email, password } = req.body;
   let foundUser = await User.findOne({ email, password });
   if (foundUser) {
