@@ -24,7 +24,7 @@ def send_message(coordinates):
                             retries=3)
 
     if producer.bootstrap_connected():
-        producer.send(KAFKA_CONFIG['producer_topic'], coordinates)
+        producer.send(KAFKA_CONFIG['producer_topic'], [coordinates])
 
 if __name__ == '__main__':
     logging.info('Service started.')
