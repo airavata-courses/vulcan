@@ -81,8 +81,8 @@ public class forecastController {
         });
 
 
-        System.out.println(String.format("Data sent to gateway:{%s}", gson.toJson(model)));
-        producer.send(gson.toJson(model));
+        System.out.println(String.format("Data sent to gateway:{%s}", gson.toJson(_forecast)));
+        producer.send(gson.toJson(_forecast));
 
 //        return gson.toJson(model);
     }
