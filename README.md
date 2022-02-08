@@ -1,13 +1,25 @@
 # Vulcan
 
-## About
-Repository for the course project for CSCI-B 649 Applied Distributed Systems in Spring 2022. This project is based on a multi-user system with a distributed architecture for consuming and processing weather data in various forms, logging its usage and presenting the weather information to the user in a web-based interface.
+## API Gateway
 
-The project is in its initial stages of development and the README will be updated as new features are added.
+Below are the steps to run the API Gateway Service. Inside the api_gateway folder run -
 
-## Core Team
+```
+docker-compose up -d
+```
 
-- Akshat Arvind
-- Amber Ramesh
-- Ratchahan Anbarasan
+This will spin up the mongoDB server inside a docker container.
 
+```
+ npm install
+```
+
+To install all the node dependencies.
+
+```
+node index.js
+```
+
+This will run the api-gateway server on port 3000.
+
+For detailed information on this service, visit [LINK](https://github.com/airavata-courses/vulcan/wiki/API-GATEWAY-WIKI)
