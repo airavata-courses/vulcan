@@ -31,7 +31,7 @@ if __name__ == "__main__":
     
     # with app.app_context():
     #     produce('sample message')
-
+    print("*** Starting Ingestor Service ***")
     with app.app_context():
         messages = consumer(topic='KAFKA_INGESTOR_TOPIC').consume()
         for m in messages:
