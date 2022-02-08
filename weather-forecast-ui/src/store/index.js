@@ -11,7 +11,7 @@ export default new Vuex.Store({
       lastName: null,
       email: null,
     },
-    isSessionActive: true,
+    isSessionActive: false,
   },
   mutations: {
     setAccessToken(ctx, accessToken) {
