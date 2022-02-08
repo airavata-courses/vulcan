@@ -11,7 +11,7 @@ export default new Vuex.Store({
       lastName: null,
       email: null,
     },
-    isSessionActive: true,
+    isSessionActive: false,
   },
   mutations: {
     setAccessToken(ctx, accessToken) {
@@ -40,7 +40,7 @@ export default new Vuex.Store({
   actions: {
     async authenticate(ctx, { username, password }) {
       const { data } = await api.post('/login', {
-        username,
+        email: username,
         password,
       });
       const { token, ...user } = data;
@@ -62,14 +62,14 @@ export default new Vuex.Store({
     async fetchWeatherData(ctx, {
       year,
       month,
-      day,
+      date,
       coords,
       onMessage,
     }) {
       const message = JSON.stringify({
         year,
         month,
-        day,
+        date,
         coords,
       });
       console.info(message);
