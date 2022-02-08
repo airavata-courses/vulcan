@@ -19,8 +19,8 @@
 
                 ./mvwn clean install
 
-2. To run the application
+2. To run the script file run.sh as
 
-                java -jar ./target/forecast_service-0.0.1-SNAPSHOT.jar
+                sh run.sh
                 
-3. The application is now hosted on port 8050.            
+The application will be built and hosted            
