@@ -94,12 +94,12 @@ export default {
     async fetch() {
       this.loading = true;
       try {
-        const [year, month, day] = this.selectedDate.split('-');
+        const [year, month, date] = this.selectedDate.split('-');
         const coords = JSON.parse(this.mapCenter);
         await this.fetchWeatherData({
           year,
           month,
-          day,
+          date,
           coords,
           onMessage: this.updateMapLayer,
         });
