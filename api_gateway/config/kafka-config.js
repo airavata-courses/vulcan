@@ -5,7 +5,7 @@ const kafka = require("kafka-node");
 var Consumer = kafka.Consumer,
  client = new kafka.KafkaClient("localhost:9092"),
  consumer = new Consumer(
- client, [ { topic: "forecast", partition: 0 } ], { autoCommit: false });
+ client, [ { topic: "gateway", partition: 0 } ], { autoCommit: false });
 
 
 var Producer = kafka.Producer,

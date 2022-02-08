@@ -47,7 +47,7 @@ wss.on('connection', function connection(ws){
 
     let payloads = [
       {
-        topic : "gateway",
+        topic : "ingestor",
         messages : msg
       }];
     
@@ -93,10 +93,11 @@ mongoose.connection.once('open',function(){
 })
 
 
-app.post('/login',passport.authenticate('jwt',{session:false}), (req, res, next) => {
+app.post('/login', async (req, res, next) => {
   const { email, password } = req.body;
-  let foundUser = User.findOne({ email });
-  if (foundUser) {
+  let foundUser = await User.findOne({ email });
+  // let foundpass = await User.findOne({password});
+  if (foundUser)  {
     return res.status(200).json("Login Succesful");
   }
   return res.status(403).json("Invalid User Name")
