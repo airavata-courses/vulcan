@@ -14,15 +14,14 @@ export default new Vuex.Store({
     isSessionActive: false,
   },
   mutations: {
-    setAccessToken(ctx, accessToken) {
+    setAccessToken(store, accessToken) {
+      store.isSessionActive = true;
       api.interceptors.request.use(
         (config) => {
           config.headers = {
             Authorization: `Bearer ${accessToken}`,
             Accept: 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
           };
-          ctx.isSessionActive = true;
           return config;
         },
         Promise.reject,
