@@ -1,5 +1,6 @@
 package com.Weather365.usermanagement.controller;
 
+import com.Weather365.usermanagement.model.loginResponse;
 import com.Weather365.usermanagement.model.userRequest;
 import com.Weather365.usermanagement.model.userResponse;
 import com.Weather365.usermanagement.service.userService;
@@ -30,7 +31,6 @@ public class userController {
     public ResponseEntity<String> register(@RequestBody String user){
 
         System.out.println("Register API invoked");
-//        System.out.println("request - " + user);
         Integer retVal = -1;
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         String response = null;
@@ -43,11 +43,6 @@ public class userController {
             //validate the given user email address
             if(this.utility.isValidEmail(data.getEmailId())){
 
-//                String hashPassword = new BCryptPasswordEncoder().encode(data.getPassword());
-                //hash password before storing it to database
-//                String hashMessage = this.utility.hash(data.getPassword());
-//                data.setPassword(hashPassword);
-
                 retVal =  this.service.register(data);
 
                 response = gson.toJson(new userResponse(
@@ -56,7 +51,6 @@ public class userController {
                         data.getLastName(),
                         data.getEmailId()));
 
-//                response = "{\"userId\" : " + retVal + "}";
                 status = HttpStatus.OK;
                 System.out.println("User Registration Success");
             }
@@ -76,24 +70,26 @@ public class userController {
     public ResponseEntity<String> login(@RequestBody String loginRequest){
 
         System.out.println("Register API invoked");
-//        System.out.println("request - " + loginRequest);
         String response = null;
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
 
         try {
             Type modelType = new TypeToken<com.Weather365.usermanagement.model.loginRequest>() {}.getType();
             Gson gson = new Gson();
             com.Weather365.usermanagement.model.loginRequest data = gson.fromJson(loginRequest, modelType);
 
-//            String hashMessage = new BCryptPasswordEncoder().encode(data.getPassword());
-
             var userData = this.service.login(data.getEmailId(), data.getPassword());
             if(userData != null){
-                response = gson.toJson(new userResponse(
+
+                String jwt = this.utility.generateJWT(
                         userData.getUserId(),
-                        userData.getFirstName(),
-                        userData.getLastName(),
-                        userData.getEmailId()));
+                        userData.getEmailId(),
+                        userData.getFirstName() + " " + userData.getLastName()
+                );
+
+                //login response with jwt value
+                response = gson.toJson(new loginResponse(jwt));
             }
             System.out.println("Login Successful");
             status = HttpStatus.OK;
