@@ -1,6 +1,6 @@
 package com.Weather365.usermanagement;
 
-import com.Weather365.usermanagement.model.user;
+import com.Weather365.usermanagement.model.userRequest;
 import com.Weather365.usermanagement.repository.userRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +17,13 @@ public class userTests {
 
     @Test
     public void testRegister(){
-        user data = new user(
+        userRequest data = new userRequest(
                 "James",
                 "Bond",
                 "jbond007@gmail.com",
                 "skyfall"
         );
-        user result = repository.save(data);
+        userRequest result = repository.save(data);
 
         assertNotNull(data);
     }

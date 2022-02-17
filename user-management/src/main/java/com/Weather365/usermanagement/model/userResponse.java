@@ -9,9 +9,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class login {
+public class userResponse {
 
+    private Integer userId;
+    private String firstName;
+    private String lastName;
     private String emailId;
-
-    private String password;
 }
