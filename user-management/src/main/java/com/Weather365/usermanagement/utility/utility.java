@@ -1,17 +1,25 @@
 package com.Weather365.usermanagement.utility;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Base64;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 @Service
 public class utility {
 
-    //implementation adapted from
-    //https://java2blog.com/validate-email-address-in-java/
+    @Value("${jwt.key}")
+    private String secret;
+
+    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+
+    //verify if the given email id is valid
     public boolean isValidEmail(String email)
     {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" +  //part before @
@@ -44,5 +52,17 @@ public class utility {
             System.out.println("Exception thrown : " + e);
         }
         return retVal;
+    }
+
+    //generate a jwt token with user-id, user email address and user name
+    public String generateJWT(Integer userId, String emailId, String userName) {
+
+        return Jwts.builder()
+                .claim("userId",userId)
+                .claim("userName", userName)
+                .setSubject(emailId)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 }
