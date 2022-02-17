@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class user extends base{
+public class userRequest extends base{
 
     private String firstName;
     private String lastName;

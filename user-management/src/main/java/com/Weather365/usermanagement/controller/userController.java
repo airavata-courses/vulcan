@@ -1,11 +1,13 @@
 package com.Weather365.usermanagement.controller;
 
-import com.Weather365.usermanagement.model.login;
-import com.Weather365.usermanagement.model.user;
+import com.Weather365.usermanagement.model.userRequest;
+import com.Weather365.usermanagement.model.userResponse;
 import com.Weather365.usermanagement.service.userService;
 import com.Weather365.usermanagement.utility.utility;
 import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,16 +27,18 @@ public class userController {
 
     @PostMapping
     @RequestMapping(value = "/register")
-    public Integer register(@RequestBody String user){
+    public ResponseEntity<String> register(@RequestBody String user){
 
         System.out.println("Register API invoked");
 //        System.out.println("request - " + user);
         Integer retVal = -1;
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        String response = null;
 
         try {
-            Type modelType = new TypeToken<user>() {}.getType();
+            Type modelType = new TypeToken<userRequest>() {}.getType();
             Gson gson = new Gson();
-            user data = gson.fromJson(user, modelType);
+            userRequest data = gson.fromJson(user, modelType);
 
             //validate the given user email address
             if(this.utility.isValidEmail(data.getEmailId())){
@@ -45,6 +49,15 @@ public class userController {
 //                data.setPassword(hashPassword);
 
                 retVal =  this.service.register(data);
+
+                response = gson.toJson(new userResponse(
+                        retVal,
+                        data.getFirstName(),
+                        data.getLastName(),
+                        data.getEmailId()));
+
+//                response = "{\"userId\" : " + retVal + "}";
+                status = HttpStatus.OK;
                 System.out.println("User Registration Success");
             }
             else{
@@ -55,31 +68,41 @@ public class userController {
             System.out.println("Exception at register api " + ex);
         }
         System.out.println("Registration Successful");
-        return retVal;
+        return new ResponseEntity<>(response, status);
     }
 
     @PostMapping
     @RequestMapping(value = "/login")
-    public boolean login(@RequestBody String loginRequest){
+    public ResponseEntity<String> login(@RequestBody String loginRequest){
 
         System.out.println("Register API invoked");
 //        System.out.println("request - " + loginRequest);
-        boolean retVal = false;
+        String response = null;
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
         try {
-            Type modelType = new TypeToken<login>() {}.getType();
+            Type modelType = new TypeToken<com.Weather365.usermanagement.model.loginRequest>() {}.getType();
             Gson gson = new Gson();
-            login data = gson.fromJson(loginRequest, modelType);
+            com.Weather365.usermanagement.model.loginRequest data = gson.fromJson(loginRequest, modelType);
 
 //            String hashMessage = new BCryptPasswordEncoder().encode(data.getPassword());
 
-            retVal = this.service.login(data.getEmailId(), data.getPassword());
+            var userData = this.service.login(data.getEmailId(), data.getPassword());
+            if(userData != null){
+                response = gson.toJson(new userResponse(
+                        userData.getUserId(),
+                        userData.getFirstName(),
+                        userData.getLastName(),
+                        userData.getEmailId()));
+            }
+            System.out.println("Login Successful");
+            status = HttpStatus.OK;
         }
         catch (Exception ex){
             System.out.println("Exception at login" + ex);
         }
-        System.out.println("Login Successful");
-        return retVal;
+
+        return new ResponseEntity<>(response, status);
     }
 
 
