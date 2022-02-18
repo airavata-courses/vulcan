@@ -11,8 +11,6 @@ import lombok.Setter;
 @Setter
 public class userResponse {
 
-    private Integer userId;
-    private String firstName;
-    private String lastName;
-    private String emailId;
+    private String status;
+    private String message;
 }

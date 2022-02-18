@@ -9,10 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.google.gson.Gson;
 import java.lang.reflect.Type;
 
@@ -30,38 +27,39 @@ public class userController {
     @RequestMapping(value = "/register")
     public ResponseEntity<String> register(@RequestBody String user){
 
+        //System-log
         System.out.println("Register API invoked");
-        Integer retVal = -1;
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        String _status = "fail";
+        String _message = "Registration failed!";
+        Gson gson = new Gson();
         String response = null;
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
         try {
             Type modelType = new TypeToken<userRequest>() {}.getType();
-            Gson gson = new Gson();
             userRequest data = gson.fromJson(user, modelType);
 
             //validate the given user email address
             if(this.utility.isValidEmail(data.getEmailId())){
-
-                retVal =  this.service.register(data);
-
-                response = gson.toJson(new userResponse(
-                        retVal,
-                        data.getFirstName(),
-                        data.getLastName(),
-                        data.getEmailId()));
-
-                status = HttpStatus.OK;
-                System.out.println("User Registration Success");
+                if(this.service.register(data)){
+                    _status = "success";
+                    _message = "User Registration Success";
+                    status = HttpStatus.OK;
+                    System.out.println(_message);
+                }
             }
             else{
-                System.out.println("User Registration failed : Invalid email address");
+                _message = "User Registration failed : Invalid email address";
+                //System-log
+                System.out.println(_message);
             }
         }
         catch (Exception ex){
+            //System-log
             System.out.println("Exception at register api " + ex);
         }
-        System.out.println("Registration Successful");
+        response = gson.toJson(new userResponse(_status, _message));
         return new ResponseEntity<>(response, status);
     }
 
@@ -69,6 +67,7 @@ public class userController {
     @RequestMapping(value = "/login")
     public ResponseEntity<String> login(@RequestBody String loginRequest){
 
+        //System-log
         System.out.println("Register API invoked");
         String response = null;
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -84,22 +83,21 @@ public class userController {
 
                 String jwt = this.utility.generateJWT(
                         userData.getUserId(),
-                        userData.getEmailId(),
-                        userData.getFirstName() + " " + userData.getLastName()
+                        userData.getEmailId()
                 );
 
                 //login response with jwt value
                 response = gson.toJson(new loginResponse(jwt));
             }
+            //System-log
             System.out.println("Login Successful");
             status = HttpStatus.OK;
         }
         catch (Exception ex){
+            //System-log
             System.out.println("Exception at login" + ex);
         }
 
         return new ResponseEntity<>(response, status);
     }
-
-
 }
