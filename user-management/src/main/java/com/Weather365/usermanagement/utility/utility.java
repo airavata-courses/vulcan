@@ -54,12 +54,11 @@ public class utility {
         return retVal;
     }
 
-    //generate a jwt token with user-id, user email address and user name
-    public String generateJWT(Integer userId, String emailId, String userName) {
+    //generate a jwt token with user-id, user email address
+    public String generateJWT(Integer userId, String emailId) {
 
         return Jwts.builder()
                 .claim("userId",userId)
-                .claim("userName", userName)
                 .setSubject(emailId)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
