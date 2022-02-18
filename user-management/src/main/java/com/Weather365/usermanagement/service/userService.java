@@ -1,28 +1,42 @@
 package com.Weather365.usermanagement.service;
 
 import com.Weather365.usermanagement.model.userRequest;
+import com.Weather365.usermanagement.model.userResponse;
 import com.Weather365.usermanagement.repository.userRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class userService {
 
-    @Autowired
-    private userRepository repository;
+    private final userRepository repository;
 
-    public Integer register(userRequest userRequest){
+    public userService(userRepository repository) {
+        this.repository = repository;
+    }
+
+    //    @Autowired
+
+
+    public boolean register(userRequest userRequest){
+
+       boolean retVal = false;
 
         try {
             String hashPassword = new BCryptPasswordEncoder().encode(userRequest.getPassword());
             userRequest.setPassword(hashPassword);
-            return this.repository.save(userRequest).getUserId();
+
+            this.repository.save(userRequest);
+
+            retVal = true;
         }
         catch (Exception ex){
-            System.out.println("Exception occured in user service" + ex);
-            return -1;
+            System.out.println("Exception - user service" + ex);
         }
+        return retVal;
     }
 
     public userRequest login(String emailID, String password) {
@@ -37,7 +51,7 @@ public class userService {
 
 //            retVal =  password.equals(user.getPassword());
         } catch (Exception ex) {
-            System.out.println("Exception - isValidUser" + ex);
+            System.out.println("Exception - isValidUser - " + ex);
         }
 
         return retVal;
@@ -56,5 +70,4 @@ public class userService {
 
         return retVal;
     }
-
 }
