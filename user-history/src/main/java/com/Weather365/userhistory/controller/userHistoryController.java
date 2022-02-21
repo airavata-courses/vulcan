@@ -1,5 +1,6 @@
 package com.Weather365.userhistory.controller;
 
+import com.Weather365.userhistory.configuration.Producer;
 import com.Weather365.userhistory.model.radarRequest;
 import com.Weather365.userhistory.model.radarResponse;
 import com.Weather365.userhistory.model.tokenRequest;
@@ -17,7 +18,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/history/")
 public class userHistoryController {
 
     @Autowired
@@ -26,9 +26,17 @@ public class userHistoryController {
     @Autowired
     private userHistoryService service;
 
-    @PostMapping
-    @RequestMapping(value = "/save")
-    public String save(@RequestBody String request){
+    @Autowired
+    private Producer producer;
+
+    @Value ("${topic.name.producer.get}")
+    private String getProducer;
+
+    @Value ("${topic.name.producer.save}")
+    private String saveProducer;
+
+    @KafkaListener(topics = "${topic.name.consumer.save}", groupId = "group_id")
+    public void save(ConsumerRecord<String, String> request){
 
         //System-log
         System.out.println("Save User History invoked");
@@ -39,11 +47,11 @@ public class userHistoryController {
 
         try {
             Type modelType = new TypeToken<radarRequest>() {}.getType();
-            radarRequest data = gson.fromJson(request, modelType);
+            radarRequest data = gson.fromJson(request.value(), modelType);
 
             var claims = this.utility.getAllClaimsFromToken(data.getToken());
 
-            if(!this.utility.isValid(claims)){
+            if(!this.utility.isExpired(claims)){
                 var userId = claims.get("userId", Integer.class);
 
                 data.setUserId(userId);
@@ -65,40 +73,40 @@ public class userHistoryController {
             System.out.println("Exception at save user history " + ex);
         }
 
-        return gson.toJson(new radarResponse(_status, _message, null));
+        String response = gson.toJson(new radarResponse(_status, _message, null));
+
+        producer.send(saveProducer, response);
     }
 
-    @GetMapping
-    @RequestMapping(value = "/get")
-    public String get(@RequestBody String request){
+    @KafkaListener(topics = "${topic.name.consumer.get}", groupId = "group_id")
+    public void get(ConsumerRecord<String, String> request){
 
         //System-log
         System.out.println("get user history invoked");
 
         String _status = "fail";
         String _message = "get user history failed";
-        String _data = "";
+
         Gson gson = new Gson();
         List<radarRequest> result = null;
 
         try {
             Type modelType = new TypeToken<tokenRequest>() {}.getType();
-            tokenRequest data = gson.fromJson(request, modelType);
+            tokenRequest data = gson.fromJson(request.value(), modelType);
 
             var claims = this.utility.getAllClaimsFromToken(data.getToken());
 
-            if(!this.utility.isValid(claims)){
+            if(!this.utility.isExpired(claims)){
                 var userId = claims.get("userId", Integer.class);
 
                 result = this.service.getHistory(userId);
-
-
-                _status = "Success";
-                _message = "get user history Successful";
+                _status = "success";
+                _message = "get user history successful";
 
             }
             else{
                 _message = "get user history failed : Token expired";
+
                 //System-log
                 System.out.println(_message);
             }
@@ -106,9 +114,11 @@ public class userHistoryController {
         }
         catch (Exception ex){
             //System-log
-            System.out.println("Exception at get user history " + ex);
+
+            System.out.println("Exception at save user history " + ex);
         }
 
-        return gson.toJson(new radarResponse(_status, _message, result));
+        String response = gson.toJson(new radarResponse(_status, _message, result));
+        producer.send(getProducer, response);
     }
 }
