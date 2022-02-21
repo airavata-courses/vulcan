@@ -12,11 +12,14 @@ import java.util.stream.Collectors;
 @Service
 public class userHistoryService {
 
-    @Autowired
     private userHistoryRepository repository;
 
-    public void saveHistory(radarRequest data){
-        this.repository.save(data);
+    public userHistoryService(userHistoryRepository repository) {
+        this.repository = repository;
+    }
+
+    public Integer saveHistory(radarRequest data){
+        return this.repository.save(data).getId();
     }
 
     public List<radarRequest> getHistory(int userId){
