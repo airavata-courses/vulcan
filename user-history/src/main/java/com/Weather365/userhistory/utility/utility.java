@@ -2,12 +2,10 @@ package com.Weather365.userhistory.utility;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.function.Function;
 
 @Service
 public class utility {
@@ -21,7 +19,7 @@ public class utility {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
-    public boolean isValid(Claims claims){
-        return !claims.getExpiration().before(new Date());
+    public boolean isExpired(Claims claims){
+        return claims.getExpiration().before(new Date());
     }
 }
