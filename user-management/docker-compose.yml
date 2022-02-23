@@ -1,0 +1,34 @@
+version: '3'
+#networks:
+#  postgres_network:
+#    driver: bridge
+services:
+  db:
+    image: 'postgres:13.1-alpine'
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db_user_management
+#    networks:
+#      - postgres_network
+    container_name: db
+  user-management:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+#    image: user-management
+    ports:
+      - 8081:8080
+    environment:
+      - SPRING_DATASOURCE_HOST=db
+      - SPRING_DATASOURCE_PORT=5432
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_DATABASE=db_user_management
+#    networks:
+#      - postgres_network
+    container_name: user-management-service
