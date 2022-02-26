@@ -4,8 +4,6 @@ const jwt = require('jsonwebtoken');
 const app = express()
 const server = require('http').createServer(app);
 const cors = require('cors')
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({ server });
 app.use(cors());
 app.use(bodyParser.json())
 
