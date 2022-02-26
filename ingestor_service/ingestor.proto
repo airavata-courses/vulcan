@@ -1,0 +1,19 @@
+syntax = "proto3";
+package com.WeatherForcast.DbMgmtService.grpc;
+
+message msgUrl {
+  string date = 1;
+  string month = 2;
+  string year = 3;
+  string station = 4;
+  string time = 5;
+  string url = 6;
+}
+message msgId {
+  int32 id = 1;
+}
+service DbMgmtService {
+  rpc saveurl(msgUrl) returns (msgId);
+
+  rpc geturl(msgId) returns (msgUrl);
+}
