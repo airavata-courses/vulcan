@@ -3,7 +3,8 @@ const bodyParser = require('body-parser')
 const jwt = require('jsonwebtoken');
 const app = express()
 const server = require('http').createServer(app);
-const cors = require('cors')
+const cors = require('cors');
+const { consumer_get, consumer_gateway, consumer_save } = require('./config/kafka-config');
 app.use(cors());
 app.use(bodyParser.json())
 
@@ -67,7 +68,7 @@ app.post('/user-history',async(req,res) => {
   producer.on('error', function (err) {
     console.error(err)
   })
-  consumer.on("message", function (message) {
+  consumer_get.on("message", function (message) {
     console.log('received: %s', message.value);
   });
   res.send(200).json(message)
@@ -76,11 +77,14 @@ app.post('/user-history',async(req,res) => {
 
 app.post('/ingestor',async(req,res) => {
   msg = new TextDecoder('utf-8').decode(new Uint8Array(req.body))
+
+  // 1st Payload for user-history saving
   let payload1 = [
     {
       topic: "user-history-save",
       messages: msg
     }];
+  // 2nd Payload for ingestor service
   let payload2 = [
     {
       topic: "ingestor",
@@ -91,16 +95,26 @@ app.post('/ingestor',async(req,res) => {
     });
     producer.on('error', function (err) {
       console.error(err)
+    
+    // consumer_save for consuming string response from gateway-save
+    consumer_save.on("message", function (message1) {
+      console.log('received: %s', message1.value);
+    });
+    
     producer.send(payload2, function (err, data) {
       console.error(err);
     })});
     producer.on('error', function (err) {
       console.error(err)
     })
-    consumer.on("message", function (message) {
-      console.log('received: %s', message.value);
+
+    // consumer_gateway for consuming string response for visualization
+    consumer_gateway.on("message", function (message2) {
+      console.log('received: %s', message2.value);
     });
 
+    // combining final message from both consumers
+    message = {msg1 : message1, msg2 : message2}
     res.send(200).json(message)
 });
 
