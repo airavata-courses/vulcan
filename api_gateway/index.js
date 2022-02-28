@@ -7,19 +7,16 @@ const cors = require('cors');
 const { consumer_get, consumer_gateway, consumer_save } = require('./config/kafka-config');
 app.use(cors());
 app.use(bodyParser.json())
+const fetch = require('cross-fetch');
 
-const consumer = require('./config/kafka-config').consumer
+
 const producer = require("./config/kafka-config").producer
 
 // Register
-app.post('/register', async function (req, res) {
-  const { firstName, lastName, emailID, password } = req.body;
+app.post('/register', async function (req, resp) {
+  const data = JSON.stringify(req.body);
   const URL = 'http://localhost:8081/api/user/register'
-  const data = {firstName : firstName,
-  lastName : lastName,
-  email : emailID,
-  password : password};
-
+  console.log(data)
   const otherParam = {
     headers : {"content-type":"aplication/json; charset = UTF-8"},
     body : data,
@@ -30,26 +27,23 @@ app.post('/register', async function (req, res) {
   .then(res => {return res.json()})
   .then(data => console.log(data))
   .catch(error => console.log(error))
-
-  res.status(200).json('Success')
+  resp.status(200).json('Success')
 });
 
 // Login
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+app.post('/login', async (req, resp) => {
+  const data = JSON.stringify(req.body);
   const URL = 'http://localhost:8081/api/user/login'
-  const data = {email : email, password : password};
   const otherParam = {
     headers : {"content-type":"aplication/json; charset = UTF-8"},
     body : data,
     method : "POST"
   };
 
-  fetch(URL,otherParam)
-  .then(res => {return res.json()})
-  .then(data => console.log('Token'+ data))
-  .catch(error => console.log(error))
-  res.status(200).json(data)
+  let response = await fetch(URL,otherParam);
+  console.log(response.status);
+  token = await response.json();
+  resp.status(200).json(token)
 });
 
 // User-history
