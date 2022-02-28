@@ -40,19 +40,25 @@ public class userController {
             Type modelType = new TypeToken<userRequest>() {}.getType();
             userRequest data = gson.fromJson(user, modelType);
 
-            //validate the given user email address
-            if(this.utility.isValidEmail(data.getEmailId())){
-                if(this.service.register(data)){
-                    _status = "success";
-                    _message = "User Registration Success";
-                    status = HttpStatus.OK;
-                    System.out.println(_message);
-                }
+            if(this.service.getAccountByEmailId(data.getEmailId()) != null){
+                _message = "User already exists";
+                status = HttpStatus.OK;
             }
             else{
-                _message = "User Registration failed : Invalid email address";
-                //System-log
-                System.out.println(_message);
+                //validate the given user email address
+                if(this.utility.isValidEmail(data.getEmailId())){
+                    if(this.service.register(data)){
+                        _status = "success";
+                        _message = "User Registration Success";
+                        status = HttpStatus.OK;
+                        System.out.println(_message);
+                    }
+                }
+                else{
+                    _message = "User Registration failed : Invalid email address";
+                    //System-log
+                    System.out.println(_message);
+                }
             }
         }
         catch (Exception ex){
@@ -68,7 +74,7 @@ public class userController {
     public ResponseEntity<String> login(@RequestBody String loginRequest){
 
         //System-log
-        System.out.println("Register API invoked");
+        System.out.println("Login API invoked");
         String response = null;
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
