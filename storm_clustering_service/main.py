@@ -28,6 +28,7 @@ def send_message(coords: List[List[List[float]]]):
     with httpx.Client() as client:
         response = client.post(
             CONFIG['forecast_service'], json=coords)
+        response.raise_for_status()
         return response.json()
 
 
