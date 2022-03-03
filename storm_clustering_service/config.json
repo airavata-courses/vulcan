@@ -1,5 +1,6 @@
 {
   "kafka_server": "localhost:9092",
+  "forecast_service": "http://localhost:45672",
   "consumer_topic": "storm-clustering",
   "producer_topic": "forecast"
 }
