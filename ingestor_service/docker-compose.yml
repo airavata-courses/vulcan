@@ -7,3 +7,9 @@ services:
       context: ./
     ports:
       - 12552:8080
+    networks:
+      - vulcan-network
+
+networks:
+  vulcan-network:
+    name: vulcan
