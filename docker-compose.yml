@@ -26,11 +26,62 @@ services:
     networks:
       - vulcan-network
 
+  vulcan-postgres:
+    image: 'postgres'
+    container_name: vulcan-postgres
+    restart: always
+    ports:
+      - 5432:5432
+    user: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_MULTIPLE_DATABASES: db_user_history,db_user_management
+    networks:
+      - vulcan-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  http-user-history-service:
+    image: 'vulcans/http-user-history:latest'
+    container_name: http-user-history-service
+    depends_on:
+      vulcan-postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_HOST=vulcan-postgres
+      - SPRING_DATASOURCE_PORT=5432
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_DATABASE=db_user_history
+    networks:
+      - vulcan-network
+
+  user-management-service:
+    image: 'vulcans/user-management'
+    container_name: user-management-service
+    depends_on:
+      vulcan-postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_HOST=vulcan-postgres
+      - SPRING_DATASOURCE_PORT=5432
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_DATABASE=db_user_management
+    networks:
+      - vulcan-network
+
   http-api-gateway:
     image: vulcans/http-api-gateway
     container_name: http-api-gateway
     depends_on:
       - http-ingestor-service
+      - http-user-history-service
+      - user-management-service
     build:
       context: ./
     ports:
