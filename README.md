@@ -42,6 +42,3 @@ The project is in its initial stages of development and the README will be updat
 2. MySQL Database
 3. Mongo Database
 4. Services
-
-
-

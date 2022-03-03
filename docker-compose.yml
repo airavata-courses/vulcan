@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  http-forecast-service:
+    image: 'vulcans/http-forecast-service'
+    container_name: http-forecast-service
+    networks:
+      - vulcan-network
+
+  http-storm-clustering-service:
+    image: vulcans/http-storm-clustering-service
+    container_name: http-storm-clustering-service
+    depends_on:
+      - http-forecast-service
+    build:
+      context: ./
+    networks:
+      - vulcan-network
+
+  http-ingestor-service:
+    image: vulcans/http-ingestor-service
+    container_name: http-ingestor-service
+    depends_on:
+      - http-storm-clustering-service
+    build:
+      context: ./
+    networks:
+      - vulcan-network
+
+  http-api-gateway:
+    image: vulcans/http-api-gateway
+    container_name: http-api-gateway
+    depends_on:
+      - http-ingestor-service
+    build:
+      context: ./
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: production
+    networks:
+      - vulcan-network
+
+networks:
+  vulcan-network:
+    name: vulcan
