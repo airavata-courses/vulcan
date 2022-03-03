@@ -39,7 +39,7 @@ const standardForwarder = async function (req, res, apiInstance, endpoint = '') 
 }
 
 // Register
-app.post('/register', (req, res) => res.standardForwarder(req, res, identityApi, '/register'))
+app.post('/register', (req, res) => standardForwarder(req, res, identityApi, '/register'))
 
 // Login
 app.post('/login', (req, res) => standardForwarder(req, res, identityApi, '/login'))
@@ -51,9 +51,14 @@ app.post('/forecast', (req, res) => {
 })
 
 app.get('/history', async (req, res) => {
-  const data = req.params
-  const response = await historyApi.get('get', data)
-  return res.status(200).json(response.data)
+  try {
+    const data = req.body
+    const response = await historyApi.post('get', data)
+    return res.status(200).json(response.data)
+  } catch (err) {
+    logger.error(err.message)
+    res.status(400).json(err.message)
+  }
 })
 
 logger.level = 'debug'

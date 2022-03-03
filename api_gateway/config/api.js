@@ -7,7 +7,7 @@ const identityApi = axios.create({
   }
 })
 const historyApi = axios.create({
-  baseURL: 'http://http-user-history:8080/api/history',
+  baseURL: 'http://http-user-history-service:8080/api/history',
   headers: {
     'Content-Type': 'application/json; charset=utf-8'
   }

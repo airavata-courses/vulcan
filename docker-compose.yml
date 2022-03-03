@@ -1,13 +1,13 @@
 version: '3.8'
 services:
   http-forecast-service:
-    image: 'vulcans/http-forecast-service'
+    image: vulcans/http-forecast-service:latest
     container_name: http-forecast-service
     networks:
       - vulcan-network
 
   http-storm-clustering-service:
-    image: vulcans/http-storm-clustering-service
+    image: vulcans/http-storm-clustering-service:latest
     container_name: http-storm-clustering-service
     depends_on:
       - http-forecast-service
@@ -17,7 +17,7 @@ services:
       - vulcan-network
 
   http-ingestor-service:
-    image: vulcans/http-ingestor-service
+    image: vulcans/http-ingestor-service:latest
     container_name: http-ingestor-service
     depends_on:
       - http-storm-clustering-service
@@ -27,7 +27,7 @@ services:
       - vulcan-network
 
   vulcan-postgres:
-    image: 'postgres'
+    image: lmmdock/postgres-multi
     container_name: vulcan-postgres
     restart: always
     ports:
@@ -36,7 +36,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_MULTIPLE_DATABASES: db_user_history,db_user_management
+      POSTGRES_DATABASES: db_user_history:postgres|db_user_management:postgres
     networks:
       - vulcan-network
     healthcheck:
@@ -46,7 +46,7 @@ services:
       retries: 5
 
   http-user-history-service:
-    image: 'vulcans/http-user-history:latest'
+    image: vulcans/http-user-history:latest
     container_name: http-user-history-service
     depends_on:
       vulcan-postgres:
@@ -61,7 +61,7 @@ services:
       - vulcan-network
 
   user-management-service:
-    image: 'vulcans/user-management'
+    image: vulcans/user-management:latest
     container_name: user-management-service
     depends_on:
       vulcan-postgres:
@@ -76,7 +76,7 @@ services:
       - vulcan-network
 
   http-api-gateway:
-    image: vulcans/http-api-gateway
+    image: vulcans/http-api-gateway:latest
     container_name: http-api-gateway
     depends_on:
       - http-ingestor-service
