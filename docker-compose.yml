@@ -11,8 +11,6 @@ services:
     container_name: http-storm-clustering-service
     depends_on:
       - http-forecast-service
-    build:
-      context: ./
     networks:
       - vulcan-network
 
@@ -21,8 +19,6 @@ services:
     container_name: http-ingestor-service
     depends_on:
       - http-storm-clustering-service
-    build:
-      context: ./
     networks:
       - vulcan-network
 
@@ -82,8 +78,6 @@ services:
       - http-ingestor-service
       - http-user-history-service
       - user-management-service
-    build:
-      context: ./
     ports:
       - 3000:3000
     environment:
