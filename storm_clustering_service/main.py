@@ -7,6 +7,7 @@ import random
 from typing import List
 import uvicorn
 import ujson
+from urllib.parse import urljoin
 
 with open('config.json') as config:
     CONFIG = ujson.load(config)
@@ -27,7 +28,7 @@ app = FastAPI()
 def send_message(coords: List[List[List[float]]]):
     with httpx.Client() as client:
         response = client.post(
-            CONFIG['forecast_service'], json=coords)
+            urljoin(CONFIG['forecast_service'], '/api/forecast/predict'), json=coords)
         response.raise_for_status()
         return response.json()
 
