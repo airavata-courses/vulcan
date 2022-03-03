@@ -1,11 +1,17 @@
-version: '3.7'
+version: '3.8'
 services:
-  mongodb_container:
-    image: mongo:latest
+  http-api-gateway:
+    image: vulcans/http-api-gateway
+    container_name: http-api-gateway
+    build:
+      context: ./
     ports:
-      - 27017:27017
-    volumes:
-      - mongodb_data_container:/data/db
+      - 3000:3000
+    environment:
+      NODE_ENV: production
+    networks:
+      - vulcan-network
 
-volumes:
-  mongodb_data_container:
+networks:
+  vulcan-network:
+    name: vulcan

@@ -1,0 +1,25 @@
+version: '3'
+services:
+  db-user-history:
+    image: 'postgres:13.1-alpine'
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db_user_history
+    container_name: db-user-history
+  http-user-history:
+    image: 'vulcans/http-user-history:latest'
+    depends_on:
+      - db-user-history
+      - kafka
+    ports:
+      - 8082:8080
+    environment:
+      - SPRING_DATASOURCE_HOST=db-user-history
+      - SPRING_DATASOURCE_PORT=5432
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_DATABASE=db_user_history
+    container_name: http-user-history-service
