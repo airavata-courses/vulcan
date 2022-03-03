@@ -55,4 +55,4 @@ async def serve(coordinates: List[float]) -> ForecastGeoJson:
 
 if __name__ == '__main__':
     logger.setLevel(logging.DEBUG)
-    uvicorn.run(app, host='0.0.0.0', port=46283)
+    uvicorn.run(app, host='0.0.0.0', port=8080)
