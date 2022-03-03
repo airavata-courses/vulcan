@@ -1,45 +1,58 @@
-from flask import Flask
+
+from config import STORM_CLUSTERING_SERVER, STORM_CLUSTERING_PORT
+from fastapi import FastAPI
+import httpx
+import logging
+from models import ClientRequest
 from nexrad import NexRad
-from consumer import consumer
-from producer import producer
-import json
+from sys import stdout
+from typing import List
+import ujson
+import uvicorn
 
-app = Flask(__name__)
+logger = logging.getLogger()
+log_fhandler = logging.FileHandler('ingestor.log', mode='a')
+log_shandler = logging.StreamHandler(stdout)
+formatter = logging.Formatter(
+    '%(levelname)s %(asctime)s - %(message)s')
+log_shandler.setFormatter(formatter)
+log_fhandler.setFormatter(formatter)
+logger.addHandler(log_fhandler)
+logger.addHandler(log_shandler)
 
-#creates an object of Nexrad class
-#validates the received json data
-#posts the data to Database Management service
+app = FastAPI()
+
+
+def send_message(coords: List[float]):
+    with httpx.Client() as client:
+        response = client.post(
+            httpx.URL(f'{STORM_CLUSTERING_SERVER}:{STORM_CLUSTERING_PORT}'), json=coords)
+        response.raise_for_status()
+        return response.json()
+
+# creates an object of Nexrad class
+# validates the received json data
+# posts the data to Database Management service
+
+
 def saveurl(data):
-    print(f"data received - {data}")
-
     if data is not None:
         nexRad = NexRad(data)
-        
-        if(nexRad.validate()):
-            #post the data to the grpc server
-            message = nexRad.saveNexradData()
+        return nexRad.validate()
 
-            print(f'Message returned from db management service - {message}')
 
-            output = [data["coords"]]
+@app.post('/')
+async def serve(request: ClientRequest) -> List[float]:
+    try:
+        logger.debug(f'Incoming request: {request}')
+        if not saveurl(request):
+            logger.error('NEXRAD parameter validation failed.')
 
-            status = producer(topic='KAFKA_STORM_DETECTION_TOPIC').produce(json.dumps(output))
-            print(status)
-        else:
-            print("fail")
-
+        response = send_message(coords=request.coords)
+        return response
+    except Exception as e:
+        logger.error(e)
+        return e
 
 if __name__ == "__main__":
-    
-    # with app.app_context():
-    #     produce('sample message')
-
-    with app.app_context():
-        messages = consumer(topic='KAFKA_INGESTOR_TOPIC').consume()
-        for m in messages:
-            if m is not None:
-                data = json.loads(m.value.decode('utf-8'))
-                saveurl(data)
-    
-
-    
+    uvicorn.run(app, host='0.0.0.0', port=8080)
