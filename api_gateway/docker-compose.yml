@@ -9,3 +9,9 @@ services:
       - 3000:3000
     environment:
       NODE_ENV: production
+    networks:
+      - vulcan-network
+
+networks:
+  vulcan-network:
+    name: vulcan
