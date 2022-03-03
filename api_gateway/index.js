@@ -31,8 +31,8 @@ const asyncForwarder = async function (req, apiInstance, endpoint = '') {
 const standardForwarder = async function (req, res, apiInstance, endpoint = '') {
   const data = req.body
   try {
-    const response = await requestForwarder(apiInstance, endpoint, data)
-    res.status(200).json(response.data)
+    const result = await requestForwarder(apiInstance, endpoint, data)
+    res.status(200).json(result)
   } catch (err) {
     res.status(500).send(err.message)
   }
@@ -53,7 +53,7 @@ app.post('/forecast', (req, res) => {
 app.get('/history', async (req, res) => {
   const data = req.params
   const response = await historyApi.get('get', data)
-  res.status(200).json(response.data)
+  return res.status(200).json(response.data)
 })
 
 logger.level = 'debug'
