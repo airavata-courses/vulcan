@@ -1,19 +1,19 @@
 const axios = require('axios').default
 
 const identityApi = axios.create({
-  baseURL: 'http://localhost:8081/api/user',
+  baseURL: 'http://user-management-service:8080/api/user',
   headers: {
     'Content-Type': 'application/json; charset=utf-8'
   }
 })
 const historyApi = axios.create({
-  baseURL: 'http://localhost:34535/api/history',
+  baseURL: 'http://user-history:8080/api/history',
   headers: {
     'Content-Type': 'application/json; charset=utf-8'
   }
 })
 const ingestorApi = axios.create({
-  baseURL: 'http://localhost:12552',
+  baseURL: 'http://http-ingestor-service:8080',
   headers: {
     'Content-Type': 'application/json; charset=utf-8'
   }

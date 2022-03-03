@@ -2,7 +2,10 @@ const express = require('express')
 const app = express()
 const server = require('http').createServer(app)
 const cors = require('cors')
+const bodyParser = require('body-parser')
 app.use(cors())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json())
 
 const { identityApi, historyApi, ingestorApi } = require('./config/api')
 const logger = require('./config/logging')
@@ -43,13 +46,13 @@ app.post('/login', (req, res) => standardForwarder(req, res, identityApi, '/logi
 
 // User-History + (Ingestor - Storm Clustering - Forecast)
 app.post('/forecast', (req, res) => {
-  asyncForwarder(req, historyApi)
+  asyncForwarder(req, historyApi, 'save')
   standardForwarder(req, res, ingestorApi)
 })
 
-app.get('user-history', async (req, res) => {
+app.get('/history', async (req, res) => {
   const data = req.params
-  const response = await historyApi.get('', data)
+  const response = await historyApi.get('get', data)
   res.status(200).json(response.data)
 })
 
