@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-history
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app : user-history
+  template:
+    metadata:
+      name: user-history
+      labels:
+        app: user-history
+    spec:
+      containers:
+        - name: user-history
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: password
+            - name: SPRING_DATASOURCE_HOST
+              value: vulcan-postgres
+            - name: SPRING_DATASOURCE_DATABASE
+              value: db_user_history
+          ports:
+            - containerPort: 8080
+              name: user-history
+          image: vulcans/http-user-history:latest
+      initContainers:
+        - name: init-postgres
+          image: busybox:latest
+          command: ['sh', '-c', "until nslookup vulcan-postgres; do echo waiting for mysql; sleep 2; done;"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-user-history-service
+spec:
+  selector :
+    app : user-history
+  type: ClusterIP
+  ports:
+    - protocol : "TCP"
+      port: 8080
