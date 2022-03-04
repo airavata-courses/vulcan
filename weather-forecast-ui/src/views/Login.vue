@@ -59,8 +59,9 @@ export default {
           password: this.password,
         });
         this.$router.push({ name: 'Home' });
-      // eslint-disable-next-line no-empty
-      } catch {}
+      } catch (err) {
+        console.error(err);
+      }
     },
   },
 };

@@ -32,9 +32,11 @@ const router = new VueRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requireAuth)) {
-    if (store.state.isSessionActive) {
+    if (store.getters.isSessionActive) {
+      next();
+    } else if (await store.dispatch('retrieveSavedToken')) {
       next();
     } else {
       next({ name: 'Login' });
