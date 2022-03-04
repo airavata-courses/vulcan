@@ -6,26 +6,21 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    accessToken: null,
     user: {
       firstName: null,
       lastName: null,
       email: null,
     },
-    isSessionActive: false,
+  },
+  getters: {
+    isSessionActive(state) {
+      return !!state.accessToken;
+    },
   },
   mutations: {
     setAccessToken(store, accessToken) {
-      store.isSessionActive = true;
-      api.interceptors.request.use(
-        (config) => {
-          config.headers = {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: 'application/json',
-          };
-          return config;
-        },
-        Promise.reject,
-      );
+      store.accessToken = accessToken;
     },
 
     setUserDetails(ctx, { firstName, lastName, email }) {
@@ -39,12 +34,30 @@ export default new Vuex.Store({
   actions: {
     async authenticate(ctx, { username, password }) {
       const { data } = await api.post('/login', {
-        email: username,
+        emailId: username,
         password,
       });
-      const { token, ...user } = data;
+      const { token } = data;
+      if (!token) {
+        throw new Error('Invalid credentials');
+      }
+      const { sub } = JSON.parse(decodeURIComponent(Buffer.from(token.split('.')[1], 'base64')));
+      window.localStorage.setItem('accessToken', token);
       ctx.commit('setAccessToken', token);
-      ctx.commit('setUserDetails', user);
+      ctx.commit('setUserDetails', { email: sub });
+      Object.assign(api.defaults.headers.common, {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      });
+    },
+
+    retrieveSavedToken(ctx) {
+      const token = window.localStorage.getItem('accessToken');
+      if (token) {
+        ctx.commit('setAccessToken', token);
+        return true;
+      }
+      return false;
     },
 
     async createAccount(ctx, {
@@ -53,7 +66,7 @@ export default new Vuex.Store({
       return api.post('/register', {
         firstName,
         lastName,
-        email: username,
+        emailId: username,
         password,
       });
     },
@@ -63,27 +76,16 @@ export default new Vuex.Store({
       month,
       date,
       coords,
-      onMessage,
     }) {
-      const message = JSON.stringify({
+      const request = {
         year,
         month,
         date,
         coords,
-      });
-      console.info(message);
-      const ws = new WebSocket(process.env.VUE_APP_WS_BASE_URL);
-      ws.onmessage = (event) => {
-        onMessage(event.data);
-        ws.close();
+        token: ctx.state.accessToken,
       };
-      return new Promise((resolve, reject) => {
-        ws.onopen = (event) => {
-          ws.send(message);
-          resolve(event.data);
-        };
-        ws.onerror = (event) => reject(event.data);
-      });
+      const response = await api.post('/forecast', request);
+      return response.data;
     },
   },
 });

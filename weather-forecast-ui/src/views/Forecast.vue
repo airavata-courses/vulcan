@@ -96,21 +96,20 @@ export default {
       try {
         const [year, month, date] = this.selectedDate.split('-');
         const coords = JSON.parse(this.mapCenter);
-        await this.fetchWeatherData({
+        const geoJson = await this.fetchWeatherData({
           year,
           month,
           date,
           coords,
-          onMessage: this.updateMapLayer,
         });
+        this.updateMapLayer(geoJson);
       } catch (err) {
         console.error(err);
         this.loading = false;
       }
     },
-    updateMapLayer(message) {
+    updateMapLayer(geoJson) {
       this.loading = false;
-      const geoJson = JSON.parse(message);
       console.info(geoJson);
       Object.assign(this.mapLayer, geoJson);
     },
