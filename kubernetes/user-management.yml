@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-management
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app : user-management
+  template:
+    metadata:
+      name: user-management
+      labels:
+        app: user-management
+    spec:
+      containers:
+        - name: user-management
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: password
+            - name: SPRING_DATASOURCE_HOST
+              value: vulcan-postgres
+            - name: SPRING_DATASOURCE_DATABASE
+              value: db_user_management
+          ports:
+            - containerPort: 8080
+              name: user-management
+          image: vulcans/user-management:latest
+      initContainers:
+        - name: init-postgres
+          image: busybox:latest
+          command: ['sh', '-c', "until nslookup vulcan-postgres; do echo waiting for mysql; sleep 2; done;"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-management-service
+spec:
+  selector :
+    app : user-management
+  type: ClusterIP
+  ports:
+    - protocol : "TCP"
+      port: 8080

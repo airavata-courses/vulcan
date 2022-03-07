@@ -1,0 +1,37 @@
+version: 2.1
+jobs:
+  build:
+    working_directory: ~/vulcan/user-management
+    docker:
+      - image: circleci/openjdk:11-stretch
+        environment:
+          PGHOST: 127.0.0.1
+
+      - image: circleci/postgres:9.6.2-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: db_user_management
+          POSTGRES_PASSWORD: password
+
+    steps:
+
+      - checkout:
+          path: ~/vulcan
+
+      - restore_cache:
+          key: user-management-{{ checksum "pom.xml" }}
+
+      - run: mvn dependency:go-offline
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: user-management-{{ checksum "pom.xml" }}
+
+      - run:
+          name: wait for db
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run: mvn package
+      - run: mvn clean test
+      - run: mvn install

@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  http-ingestor-service:
+    image: vulcans/http-ingestor-service
+    container_name: http-ingestor-service
+    build:
+      context: ./
+    ports:
+      - 12552:8080
+    networks:
+      - vulcan-network
+
+networks:
+  vulcan-network:
+    name: vulcan
