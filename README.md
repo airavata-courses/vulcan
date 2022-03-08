@@ -65,7 +65,7 @@ The application is containerized and is hosted in docker registry. To setup the 
 
 - To manually scale the application to 3 replicas run the following [kube-scale.sh](https://github.com/airavata-courses/vulcan/blob/main/kube-scale.sh) script file with -r as 3
 
-                sh kube-scale.sh -r 3
+                bash kube-scale.sh -r 3
 
 ---
 ## Jmeter 
