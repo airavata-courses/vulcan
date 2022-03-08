@@ -5,48 +5,42 @@ Repository for the course project for CSCI-B 649 Applied Distributed Systems in 
 
 The project is in its initial stages of development and the README will be updated as new features are added.
 
-## Team
-
-- Akshat Arvind
-- Amber Ramesh
-- Ratchahan Anbarasan
-
 # Project 1
 
-## System Architecture
+## Architecture Diagram
 
-![image](https://user-images.githubusercontent.com/96559018/152918648-57a1ad5e-b9a4-4d73-9b40-77c584aaae17.png)
+<img width="914" alt="Screen Shot 2022-03-04 at 11 31 24 PM" src="https://user-images.githubusercontent.com/96559018/156868170-b6e0576d-5004-467c-a25e-c937a41b8520.png">
 
-## Tech Stack
+## Napkin Diagram
 
-- Spring boot
-- Maven
-- JPA
-- Lombok
-- MySQL
+<img width="473" alt="image" src="https://user-images.githubusercontent.com/96559018/156868201-3a14886d-9171-4d79-a74a-cc4e4ba117db.png">
+
+## Technology stack
+
+The microservices from the architecture above is built with the following tech stack
+
 - Java 17
-- grpc
-- kafka
+- SpringBoot
+- Maven
+- Lombok
+- JPA
 - Python 3
-- Flask
-- Docker
+- FastAPI
 - Express
 - NodeJS
-- Web Sockets
-
-## Installation Procedure:
-
-### Pre-requisites:
-
+- MongoDB
+- PostgresSQL
 - Docker
-- openjdk 17
 
-### Installation Order
+## Pre-requisites
 
-1. Kafka and Zookeeper server
-2. MySQL Database
-3. Mongo Database
-4. Services
+- Docker 
+
+## Setup
+
+The application is containerized and is hosted in docker registry. To setup the application run the [docker-compose](https://github.com/airavata-courses/vulcan/blob/main/docker-compose.yml) file.
+
+## Sample GIF
 
 # Project 2
 
@@ -65,11 +59,11 @@ The project is in its initial stages of development and the README will be updat
 
 ## Setup
 
-- Run the following command deploy the application in the kubernetes cluster
+- Navigate to this [folder](https://github.com/airavata-courses/vulcan) and run the following command deploy the application in the Kubernetes cluster
 
                 kubectl apply -f kubernetes/. --recursive
 
-- To manually scale the application to 3 replicas run the following script file with -r as 3
+- To manually scale the application to 3 replicas run the following [kube-scale.sh](https://github.com/airavata-courses/vulcan/blob/main/kube-scale.sh) script file with -r as 3
 
                 sh kube-scale.sh -r 3
 
