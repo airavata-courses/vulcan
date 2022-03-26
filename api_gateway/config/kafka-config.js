@@ -1,28 +1,12 @@
 const kafka = require("kafka-node");
+const config  = require("./appconfig")
 
 var Consumer = kafka.Consumer,
- client = new kafka.KafkaClient("localhost:9092"),
- consumer_gateway = new Consumer(
- client, [ { topic: "gateway", partition: 0 }],
-             { autoCommit: false });
-
-var Consumer = kafka.Consumer,
-client = new kafka.KafkaClient("localhost:9092"),
-consumer_save = new Consumer(
-client, [ { topic: "gateway-save", partition: 0 }],
-            { autoCommit: false });
-
-var Consumer = kafka.Consumer,
-client = new kafka.KafkaClient("localhost:9092"),
-consumer_get = new Consumer(
-client, [ { topic: "gateway-get", partition: 0 }],
-            { autoCommit: false });
-
+client = new kafka.KafkaClient({kafkaHost:config.kafkaBootstrapServer}),
+register_response = new Consumer(client, [ { topic: config.topic_user_register_response, partition: 0 } ], { autoCommit: false });
+login_response = new Consumer(client, [ { topic: config.topic_user_login_response, partition: 0 } ], { autoCommit: false });
 
 var Producer = kafka.Producer,
-client = new kafka.KafkaClient("localhost:9092"),
+
 producer = new Producer(client)
-
-
-module.exports = { producer, consumer_gateway, consumer_get, consumer_save };
-
+module.exports = { producer, register_response, login_response };
