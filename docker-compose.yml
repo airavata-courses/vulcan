@@ -61,7 +61,7 @@ services:
       - vulcan-network
 
   user-management-service:
-    image: vulcans/user-management:latest
+    image: vulcans/kafka-user-management:latest
     container_name: user-management-service
     depends_on:
       vulcan-postgres:
@@ -75,19 +75,21 @@ services:
     networks:
       - vulcan-network
 
-  http-api-gateway:
-    image: vulcans/http-api-gateway:latest
-    container_name: http-api-gateway
+  api-gateway:
+    # image: vulcans/http-api-gateway:latest
+    container_name: api-gateway
+    build:
+      context: api_gateway
     depends_on:
       - http-ingestor-service
       - http-user-history-service
       - user-management-service
-    build:
-      context: ./
     ports:
       - 3000:3000
     environment:
       NODE_ENV: production
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
     networks:
       - vulcan-network
 
