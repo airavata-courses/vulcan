@@ -8,10 +8,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 
 const { identityApi, historyApi, ingestorApi } = require('./config/api')
-const {producer, register_response, login_response} = require('./config/kafka-config')
+const { producer, register_response, login_response } = require('./config/kafka-config')
 const logger = require('./config/logging')
 const config = require('./config/appconfig')
-const { resolve } = require('path')
 
 const requestForwarder = async function (apiInstance, endpoint, requestBody) {
   logger.debug(`POST ${apiInstance.defaults.baseURL}${endpoint} ${JSON.stringify(requestBody) || '""'}`)
@@ -41,38 +40,46 @@ const standardForwarder = async function (req, res, apiInstance, endpoint = '') 
   }
 }
 
-const kafkaHandler = async function(topic, request, response, consumer){
-
+const kafkaHandler = async function (topic, request, response, consumer) {
   const data = JSON.stringify(request.body)
-  
   let payloads = [
     {
-    topic: topic,
-    messages: data
-    }];
+      topic,
+      messages: data
+    }
+  ];
 
-  producer.send(payloads, (err, data) => {
-    if (err) {
-    console.log('Error: Method - KafkaHandler topic - '+topic+'')
-    }});
-  
-  consumer.on('message', function (message) {
-    console.log(message.value);
-    response.status(200).json(message.value)
-  });
-  
-  consumer.on('error', function(err){
-    console.error('error in kafka consumer')
-    reject(err)
-  })
+  try {
+    const messageValue = await new Promise((resolve, reject) => {
+      producer.send(payloads, (err) => {
+        if (err) {
+          logger.error(err)
+        }
+      });
 
+      consumer.on('message', function (message) {
+        resolve(message.value)
+      });
+
+      consumer.on('error', function (err) {
+        reject(err)
+      })
+    })
+
+    logger.debug(messageValue)
+    response.status(200).send(messageValue)
+
+  } catch (err) {
+    logger.error(err)
+    response.status(500).send('An error occurred.')
+  }
 }
 
 // Register - REST based
 // app.post('/register', (req, res) => standardForwarder(req, res, identityApi, '/register'))
 
 //Register - KAFKA based
-app.post('/register', (req, res) => kafkaHandler(config.topic_user_register_request, req, res,register_response))
+app.post('/register', (req, res) => kafkaHandler(config.topic_user_register_request, req, res, register_response))
 
 // Login
 app.post('/login', (req, res) => standardForwarder(req, res, identityApi, '/login'))
