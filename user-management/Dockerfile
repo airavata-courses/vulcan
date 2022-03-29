@@ -9,8 +9,8 @@ RUN mvn -f /usr/src/app/pom.xml clean package -DskipTests
 
 FROM openjdk:11-stretch
 
-COPY --from=build /src/usr/src/app/target/*.jar /usr/src/app/user-management.jar
+COPY --from=build /usr/src/app/target/*.jar /usr/src/app/user-management.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/usr/app/user-management.jar"]
+ENTRYPOINT ["java", "-jar", "/usr/src/app/user-management.jar"]
