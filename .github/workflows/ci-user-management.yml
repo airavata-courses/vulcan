@@ -42,7 +42,7 @@ jobs:
           context: .
           file: ./user-management/Dockerfile
           # Note: tags has to be all lower-case
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/user-management:latest 
+          tags: vulcans/user-management:latest 
           # build on feature branches, push only on main branch
 #           push: ${{ github.ref == 'refs/heads/main' }}
 
