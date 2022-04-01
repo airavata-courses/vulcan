@@ -1,3 +1,16 @@
+# maven building and packaging
+FROM maven:3.6.0-jdk-11-slim AS build
+
+COPY user-management/src/. /usr/src/app/src
+COPY user-management/pom.xml /usr/src/app
+
+# build the jar file  
+RUN mvn -f /usr/src/app/pom.xml clean package -DskipTests
+
 FROM openjdk:11-stretch
-COPY target/*.jar user-management.jar
-ENTRYPOINT ["java", "-jar", "/user-management.jar"]
+
+COPY --from=build /usr/src/app/target/*.jar /usr/src/app/user-management.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "/usr/src/app/user-management.jar"]
