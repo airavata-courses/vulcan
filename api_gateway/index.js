@@ -3,12 +3,12 @@ const app = express()
 const server = require('http').createServer(app)
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const kafka = require("kafka-node");
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 
 const { identityApi, historyApi, ingestorApi } = require('./config/api')
-const { producer, register_response, login_response } = require('./config/kafka-config')
 const logger = require('./config/logging')
 const config = require('./config/appconfig')
 
@@ -40,23 +40,38 @@ const standardForwarder = async function (req, res, apiInstance, endpoint = '') 
   }
 }
 
-const kafkaHandler = async function (topic, request, response, consumer) {
+const kafkaHandler = async function (reqTopic, resTopic, request, response) {
   const data = JSON.stringify(request.body)
+  
   let payloads = [
     {
-      topic,
+      topic: reqTopic,
       messages: data
     }
   ];
 
   try {
     const messageValue = await new Promise((resolve, reject) => {
+
+      client = new kafka.KafkaClient({kafkaHost:config.kafkaBootstrapServer})
+      
+      producer = new kafka.Producer(client)
+
       producer.send(payloads, (err) => {
         if (err) {
           logger.error(err)
         }
       });
 
+      consumer = new kafka.Consumer(client, [ 
+        { 
+            topic: resTopic, 
+            partition: 0 
+        } ], 
+        { 
+            autoCommit: false 
+        });
+        
       consumer.on('message', function (message) {
         resolve(message.value)
       });
@@ -79,10 +94,28 @@ const kafkaHandler = async function (topic, request, response, consumer) {
 // app.post('/register', (req, res) => standardForwarder(req, res, identityApi, '/register'))
 
 //Register - KAFKA based
-app.post('/register', (req, res) => kafkaHandler(config.topic_user_register_request, req, res, register_response))
+app.post('/register', (req, res) => 
+kafkaHandler(
+  config.topic_user_register_request, 
+  config.topic_user_register_response,
+  req, 
+  res
+  )
+)
 
 // Login
-app.post('/login', (req, res) => standardForwarder(req, res, identityApi, '/login'))
+// app.post('/login', (req, res) => standardForwarder(req, res, identityApi, '/login'))
+
+// Login - KAFKA based
+app.post('/login', (req, res) => 
+kafkaHandler(
+  config.topic_user_login_request, 
+  config.topic_user_login_response,
+  req, 
+  res 
+  )
+)
+// app.post('/login', (req, res) => kafkaHandler(config.topic_user_login_request, req, res, login_response))
 
 // User-History + (Ingestor - Storm Clustering - Forecast)
 app.post('/forecast', (req, res) => {
