@@ -13,12 +13,12 @@ jobs:
       - name: Check Out Repo 
         uses: actions/checkout@v2
         with:
-          ref: 'main-user-service'
+          ref: 'api-gateway'
         
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
           
       - name: Install dependencies
-        working-directory: ./scrapbook-user-service
+        working-directory: ./api_gateway
         run: npm install
