@@ -1,8 +1,8 @@
 # maven building and packaging
 FROM maven:3.6.0-jdk-11-slim AS build
 
-COPY ./src /usr/src/app/src
-COPY ./pom.xml /usr/src/app
+COPY user-history/src /usr/src/app/src
+COPY user-history/pom.xml /usr/src/app
 
 # build the jar file
 RUN mvn -f /usr/src/app/pom.xml clean package -DskipTests
