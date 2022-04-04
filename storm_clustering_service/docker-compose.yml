@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  http-storm-clustering-service:
+    image: vulcans/http-storm-clustering-service
+    container_name: http-storm-clustering-service
+    build:
+      context: ./
+    ports:
+      - 46283:8080
+    networks:
+      - vulcan-network
+
+networks:
+  vulcan-network:
+    name: vulcan
