@@ -48,7 +48,7 @@ echo 'StrictHostKeyChecking no' &>> /etc/ssh/ssh_config &&
 
 # Run the ansible playbooks to install kubernetes
 cd ../vulcan/deployments &&
-cp ../../jetstream_kubespray/inventory/$CLUSTER/hosts hosts &&
+cp ../jetstream_kubespray/inventory/$CLUSTER/deployments/hosts hosts &&
 ansible-playbook -i hosts users.yml &&
 sleep 20 &&
 ansible-playbook -i hosts install-k8s.yml &&
