@@ -40,7 +40,7 @@ const standardForwarder = async function (req, res, apiInstance, endpoint = '') 
   }
 }
 
-const kafkaHandler = async function (reqTopic, resTopic, request, response) {
+const kafkaHandler = async function (reqTopic, resTopic, request, response = null) {
   const data = JSON.stringify(request.body)
   
   let payloads = [
@@ -82,8 +82,10 @@ const kafkaHandler = async function (reqTopic, resTopic, request, response) {
     })
 
     logger.debug(messageValue)
-    response.status(200).send(messageValue)
 
+    if(response != null){
+      response.status(200).send(messageValue)
+    }
   } catch (err) {
     logger.error(err)
     response.status(500).send('An error occurred.')
@@ -120,19 +122,33 @@ kafkaHandler(
 // User-History + (Ingestor - Storm Clustering - Forecast)
 app.post('/forecast', (req, res) => {
   asyncForwarder(req, historyApi, 'save')
+  kafkaHandler(
+    config.topic_user_history_save_request, 
+    config.topic_user_history_save_response,
+    req)
   standardForwarder(req, res, ingestorApi)
 })
 
-app.get('/history', async (req, res) => {
-  try {
-    const data = req.body
-    const response = await historyApi.post('get', data)
-    return res.status(200).json(response.data)
-  } catch (err) {
-    logger.error(err.message)
-    res.status(400).json(err.message)
-  }
-})
+// app.get('/history', async (req, res) => {
+//   try {
+//     const data = req.body
+//     const response = await historyApi.post('get', data)
+//     return res.status(200).json(response.data)
+//   } catch (err) {
+//     logger.error(err.message)
+//     res.status(400).json(err.message)
+//   }
+// })
+
+// History get - KAFKA based
+app.get('/history', (req, res) => 
+kafkaHandler(
+  config.topic_user_history_get_request, 
+  config.topic_user_history_get_response,
+  req, 
+  res 
+  )
+)
 
 logger.level = 'debug'
 server.listen(3000, () => logger.info(`Service started: Server listening on ${server.address().port}`))
