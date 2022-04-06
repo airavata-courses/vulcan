@@ -1,13 +1,16 @@
 FROM python:3.9-slim-bullseye
 
-WORKDIR /usr/src/app
-COPY requirements.txt ./
+ARG SERVER_ADDRESS
+ARG USER_NAME
+ARG PASSWORD
 
+WORKDIR /usr/src/app
+COPY merra_ingestor_service/requirements.txt ./
 
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 RUN touch $HOME/.netrc 
-RUN echo "machine urs.earthdata.nasa.gov login Aksh_Ace password v6gSv@Jx3.#zRvf" >> $HOME/.netrc
+RUN echo "machine ${SERVER_ADDRESS} login ${USER_NAME} password ${PASSWORD}" >> $HOME/.netrc
 RUN chmod 0600 $HOME/.netrc
 RUN touch $HOME/.urs_cookies
 
