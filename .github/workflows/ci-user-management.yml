@@ -2,7 +2,7 @@ name: ci-user-management
 
 on:
   push:
-    branches: [feature-user-management]
+    branches: [develop-user-management]
   pull_request:
 
   workflow_dispatch:
