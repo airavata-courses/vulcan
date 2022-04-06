@@ -22,6 +22,7 @@ from fastapi.responses import StreamingResponse
 from threading import Thread
 # from models import MerraClientRequest
 
+
 logger = logging.getLogger()
 log_fhandler = logging.FileHandler('ingestor.log', mode='a')
 log_shandler = logging.StreamHandler(stdout)
