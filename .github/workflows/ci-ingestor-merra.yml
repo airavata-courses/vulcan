@@ -29,9 +29,9 @@ jobs:
         with:
           context: .
           build-args: |
-            SERVER_ADDRESS=urs.earthdata.nasa.gov
-            USER_NAME=Aksh_Ace
-            PASSWORD=v6gSv@Jx3.#zRvf
+            SERVER_ADDRESS=${{ secrets.MERRA_SERVER }}
+            USER_NAME=${{ secrets.MERRA_USER }}
+            PASSWORD=${{ secrets.MERRA_PASSWORD_A }}
           file: ./merra_ingestor_service/Dockerfile
           push: true
           tags: vulcans/merra-ingestor-service:latest 
