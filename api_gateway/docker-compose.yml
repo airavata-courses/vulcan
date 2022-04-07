@@ -1,7 +1,8 @@
 version: '3.8'
 services:
-  http-api-gateway:
-    container_name: http-api-gateway
+  api-gateway:
+    image: vulcans/api-gateway
+    container_name: api-gateway
     build:
       context: .
     ports:
