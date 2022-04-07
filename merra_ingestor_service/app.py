@@ -1,5 +1,3 @@
-from ast import Return
-from concurrent.futures import thread
 import logging
 import os
 import sys
@@ -16,11 +14,9 @@ from fastapi import FastAPI
 import xarray as xr
 from models import MerraClientRequest
 import matplotlib.pyplot as plt
-from config import *
 import uvicorn
 from fastapi.responses import StreamingResponse
 from threading import Thread
-# from models import MerraClientRequest
 
 logger = logging.getLogger()
 log_fhandler = logging.FileHandler('ingestor.log', mode='a')
@@ -211,7 +207,7 @@ def convert_files(files):
         if os.path.isfile(f'./zarr/{file}.zarr'):
             logger.info(f'File {file}.zarr already exists')
             continue
-        ds.to_zarr('./zarr/'+file.replace('.nc','.zarr'))
+        # ds.to_zarr('./zarr/'+file.replace('.nc','.zarr'))
         ds.close()
     logger.info('Converted files to zarr format')
 
@@ -225,8 +221,8 @@ async def serve(request: MerraClientRequest) -> List[float]:
         if files :
             try:
                 bytes_image = do_plot(files[0], request.parameter)
-                # thread = Thread(target=convert_files(files))
-                # thread.start()
+                thread = Thread(target=convert_files(files))
+                thread.start()
                 return StreamingResponse(content=bytes_image, media_type='image/png')
             except ValueError as e:
                 print(e)
@@ -239,7 +235,7 @@ async def serve(request: MerraClientRequest) -> List[float]:
         return e
 
 if __name__ == "__main__":
-    uvicorn.run(app, host='0.0.0.0', port=3000)
+    uvicorn.run(app, host='0.0.0.0', port=8080)
 
 
     
