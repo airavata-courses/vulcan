@@ -1,15 +1,24 @@
-FROM continuumio/miniconda3:4.10.3p1
-
-WORKDIR /usr/src/app
+FROM continuumio/miniconda3 AS build
 
 COPY environment.yml .
 
 RUN conda env create -f environment.yml
 
-SHELL ["conda", "run", "-n", "nexrad-ingestor", "/bin/bash", "-c"]
+RUN conda install -c conda-forge conda-pack
+
+RUN conda-pack -n nexrad-ingestor -o /tmp/env.tar && \
+    mkdir /venv && cd /venv && tar xf /tmp/env.tar && \
+    rm /tmp/env.tar
+
+RUN /venv/bin/conda-unpack
+
+FROM debian:bullseye-slim AS runtime
+
+COPY --from=build /venv /venv
 
 COPY *.py .
 
-EXPOSE 8080
+SHELL ["/bin/bash", "-c"]
 
-ENTRYPOINT ["conda", "run", "-n", "nexrad-ingestor", "python3", "app.py"]
+ENTRYPOINT source /venv/bin/activate && \
+    python app.py
