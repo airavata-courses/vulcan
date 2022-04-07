@@ -9,9 +9,6 @@ git checkout develop-ansible-K8S &&
 cd .. &&
 sudo apt-get update &&
 
-# Install open stack 
-pip3 install python-openstackclient &&
-
 # Install terraform 0.14.4
 sudo apt-get install zip unzip &&
 wget https://releases.hashicorp.com/terraform/0.14.4/terraform_0.14.4_linux_amd64.zip &&
@@ -56,4 +53,9 @@ sleep 30 &&
 ansible-playbook -i hosts master.yml &&
 sleep 30 &&
 ansible-playbook -i hosts workers.yml &&
+
+scp ../kubernetes ubuntu@IP:/home/ubuntu/deploy/kubernetes
+scp docker-compose.yml ubuntu@IP:/home/ubuntu/deploy/
+scp deploy.sh ubuntu@IP:/home/ubuntu/deploy/
+
 ssh ubuntu@$IP
