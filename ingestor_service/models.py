@@ -1,9 +1,9 @@
+from datetime import datetime
 from pydantic import BaseModel
-from typing import List
 
 
-class ClientRequest(BaseModel):
-    year: str
-    month: str
-    date: str
-    coords: List[float]
+class RadarRequest(BaseModel):
+    start_time: datetime
+    end_time: datetime
+    longitude: float
+    lattitude: float
