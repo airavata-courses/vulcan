@@ -1,10 +1,10 @@
 version: '3.8'
 services:
-  http-ingestor-service:
-    image: vulcans/http-ingestor-service
-    container_name: http-ingestor-service
+  nexrad-ingestor-service:
+    image: vulcans/nexrad-ingestor-service
+    container_name: nexrad-ingestor-service
     build:
-      context: ./
+      context: .
     ports:
       - 12552:8080
     networks:
