@@ -3,17 +3,10 @@
     <v-icon>
       mdi-clock
     </v-icon>
-    <label
-    class="v-label theme--light pa-2"
-    >
-    Time</label>
-    <v-range-slider
-      :min="rangeMin"
-      :max="rangeMax - rangeStep"
-      :step="rangeStep"
-      v-model="range"
-      hide-details
-      >
+    <label class="v-label theme--light pa-2">
+      Time</label>
+    <v-range-slider :min="rangeMin" :max="rangeMax - rangeStep" :step="rangeStep" v-model="range" hide-details
+      @input="$emit('input', $event)" :disabled="disabled">
       <template v-slot:prepend>
         <div class="pa-2 grey lighten-3 rounded">
           {{ rangeSliderLabel(range[0]) }}
@@ -29,12 +22,17 @@
           {{ rangeSliderIcon(props.value) }}
         </v-icon>
       </template>
-    </v-range-slider>
-  </div>
+    </v-range-slider>  </div>
 </template>
 
 <script>
 export default {
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       rangeMin: 0,

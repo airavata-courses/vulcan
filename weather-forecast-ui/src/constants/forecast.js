@@ -16,7 +16,30 @@ const CityNames = Object.freeze({
   MIA: 'Miami, FL',
 });
 
+const LayerSource = Object.freeze({
+  Radar: 'radar',
+  Satellite: 'satellite',
+});
+
+const RadarExtent = Object.freeze({
+  Longitude: 10,
+  Latitude: 5,
+});
+
+const SatelliteExtent = Object.freeze({
+  LongitudeMin: -180,
+  LongitudeMax: 180,
+  LatitudeMin: -90,
+  LatitudeMax: 90,
+});
+
+const MAP_LAYER_PLACEHOLDER_URL = 'https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png';
+
 export {
   MapCenter,
   CityNames,
+  LayerSource,
+  RadarExtent,
+  SatelliteExtent,
+  MAP_LAYER_PLACEHOLDER_URL,
 };

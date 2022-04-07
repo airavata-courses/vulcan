@@ -71,21 +71,33 @@ export default new Vuex.Store({
       });
     },
 
-    async fetchWeatherData(ctx, {
-      year,
-      month,
-      date,
-      coords,
-    }) {
+    async fetchRadarData(// ctx, {
+      // year,
+      // month,
+      // date,
+      // }
+    ) {
+      // const request = {
+      //   year,
+      //   month,
+      //   date,
+      //   token: ctx.state.accessToken,
+      // };
       const request = {
-        year,
-        month,
-        date,
-        coords,
-        token: ctx.state.accessToken,
+        startTime: '2014-07-03T18:00:00.000Z',
+        endTime: '2014-07-03T19:00:00.000Z',
+        longitude: -76,
+        latitude: 36.5,
       };
-      const response = await api.post('/forecast', request);
-      return response.data;
+      const response = await fetch(`${process.env.VUE_APP_WEB_API_BASE_URL}/weather/radar`, {
+        headers: {
+          Accept: 'application/x-zip-compressed',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify(request),
+      });
+      return response.blob();
     },
   },
 });
