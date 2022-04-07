@@ -13,7 +13,7 @@ RUN touch $HOME/.netrc
 RUN echo "machine ${SERVER_ADDRESS} login ${USER_NAME} password ${PASSWORD}" >> $HOME/.netrc
 RUN chmod 0600 $HOME/.netrc
 RUN touch $HOME/.urs_cookies
-COPY . .
+COPY merra_ingestor_service/. .
 
 EXPOSE 8080
 
