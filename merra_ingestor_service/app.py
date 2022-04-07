@@ -16,7 +16,6 @@ from fastapi import FastAPI
 import xarray as xr
 from models import MerraClientRequest
 import matplotlib.pyplot as plt
-from config import *
 import uvicorn
 from fastapi.responses import StreamingResponse
 from threading import Thread
@@ -44,7 +43,7 @@ url = 'https://disc.gsfc.nasa.gov/service/subset/jsonwsp'
 def get_http_data(request):
     hdrs = {'Content-Type': 'application/json',
             'Accept'      : 'application/json'}
-    data = json.dumps(request)       
+    data = json.dumps(request)     
     r = http.request('POST', url, body=data, headers=hdrs)
     response = json.loads(r.data)   
     # Check for errors
@@ -177,12 +176,12 @@ def download_data(urls):
             result.raise_for_status()
             outfn = item['label']
             files.append(outfn)
-            f = open(f'./netcdf/{outfn}','wb')
+            f = open(f'./netCDF/{outfn}','wb')
             f.write(result.content)
             f.close()
             print(outfn, "is downloaded")
         except:
-            print('Error! Status code is %d for this URL:\n%s' % (result.status.code,URL))
+            print('Error! Status code is %d for this URL:\n%s' % (result.status_code,URL))
             print('Help for downloading data is at https://disc.gsfc.nasa.gov/data-access')
             
     print('Downloading is done and find the downloaded files in your current working directory')
@@ -200,19 +199,21 @@ def do_plot(file, parameter):
     im = plt.imshow(figu, alpha=0.5)
     plt.axis('off')
     # figu.plot()
+    # plt.savefig(file+'.png', transparent = True)
     bytes_image = io.BytesIO()
     plt.savefig(bytes_image, format='png', transparent=True)
     bytes_image.seek(0)
     return bytes_image
 
 def convert_files(files):
+    print(files)
     for file in files:
         ds = xr.open_dataset(f'./netCDF/{file}')
-        # check if zarr file exists
-        if os.path.isfile(f'./zarr/{file}.zarr'):
-            logger.info(f'File {file}.zarr already exists')
+        file_name = file[:-2]+'zarr'
+        if os.path.isfile(f'./zarr/{file_name}'):
+            logger.info(f'File {file_name} already exists')
             continue
-        ds.to_zarr('./zarr/'+file.replace('.nc','.zarr'))
+        # ds.to_zarr(f'./zarr/{file_name}')    
         ds.close()
     logger.info('Converted files to zarr format')
 
@@ -226,8 +227,8 @@ async def serve(request: MerraClientRequest) -> List[float]:
         if files :
             try:
                 bytes_image = do_plot(files[0], request.parameter)
-                # thread = Thread(target=convert_files(files))
-                # thread.start()
+                thread = Thread(target=convert_files(files))
+                thread.start()
                 return StreamingResponse(content=bytes_image, media_type='image/png')
             except ValueError as e:
                 print(e)
@@ -240,7 +241,7 @@ async def serve(request: MerraClientRequest) -> List[float]:
         return e
 
 if __name__ == "__main__":
-    uvicorn.run(app, host='0.0.0.0', port=3000)
+    uvicorn.run(app, host='localhost', port=8080)
 
 
     

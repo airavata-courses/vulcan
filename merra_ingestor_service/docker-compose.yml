@@ -1,12 +1,12 @@
 version: '3.8'
 services:
   merra-ingestor-service:
-    image: vulcans/merra-ingestor-service
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: merra-ingestor-service
-    build:
-      context: ./
     ports:
-      - 12553:3000
+      - 12553:8080
     networks:
       - vulcan-network
 

@@ -2,9 +2,7 @@ certifi
 fastapi
 xarray
 matplotlib
-kafka-python
 urllib3
 requests
 netCDF4
 uvicorn
-
