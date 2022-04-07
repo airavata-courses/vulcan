@@ -1,2 +1,2 @@
-docker build . -t vulcans/http-ingestor-service
+docker build . --no-cache -t vulcans/nexrad-ingestor-service &&
 docker-compose up
