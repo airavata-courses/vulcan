@@ -1,2 +1,4 @@
-docker build . -t vulcans/http-api-gateway
+docker rm api-gateway
+docker rmi vulcans/api-gateway
+docker build --tag vulcans/api-gateway . &&
 docker-compose up
