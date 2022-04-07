@@ -6,7 +6,7 @@ services:
     build:
       context: ./
     ports:
-      - 12553:3000
+      - 12553:8080
     networks:
       - vulcan-network
 
