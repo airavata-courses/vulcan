@@ -10,7 +10,7 @@ app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-const { nexradApi } = require('./config/api')
+const { nexradApi, merraApi } = require('./config/api')
 const logger = require('./config/logging')
 const config = require('./config/appconfig')
 
@@ -30,8 +30,8 @@ const streamingForwarder = async function (req, res, apiInstance, endpoint = '')
   try {
     const responseStream = new MemoryStream()
     const { data, headers } = await requestForwarder(apiInstance, endpoint, requestData, { responseType: 'stream' })
-    res.setHeader('Content-Type', headers['content-type'])
-    res.setHeader('Content-Disposition', headers['content-disposition'])
+    headers['content-type'] && res.setHeader('Content-Type', headers['content-type'])
+    headers['content-disposition'] && res.setHeader('Content-Disposition', headers['content-disposition'])
     data.pipe(res)
     await finished(responseStream)
     res.end()
@@ -55,7 +55,11 @@ const kafkaHandler = async function (reqTopic, resTopic, request, response = nul
       client = new kafka.KafkaClient({ kafkaHost: config.kafkaBootstrapServer })
       producer = new kafka.Producer(client)
 
-      producer.send(payloads, reject);
+      producer.send(payloads, function (err) {
+        if (err) {
+          reject(err)
+        }
+      });
       consumer = new kafka.Consumer(client, [
         {
           topic: resTopic,
@@ -111,6 +115,15 @@ app.post('/weather/radar', (req, res) => {
     config.topic_user_history_save_response,
     req)
   streamingForwarder(req, res, nexradApi)
+})
+
+// User-History + NEXRAD Ingestor
+app.post('/weather/satellite', (req, res) => {
+  kafkaHandler(
+    config.topic_user_history_save_request,
+    config.topic_user_history_save_response,
+    req)
+  streamingForwarder(req, res, merraApi)
 })
 
 // History get - KAFKA based

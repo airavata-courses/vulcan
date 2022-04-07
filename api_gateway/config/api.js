@@ -7,6 +7,14 @@ const nexradApi = axios.create({
   }
 })
 
+const merraApi = axios.create({
+  baseURL: 'http://merra-ingestor-service:8080',
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8'
+  }
+})
+
 module.exports = {
-  nexradApi
+  nexradApi,
+  merraApi
 }
