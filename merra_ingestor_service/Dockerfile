@@ -5,7 +5,7 @@ ARG USER_NAME
 ARG PASSWORD
 
 WORKDIR /usr/src/app
-COPY requirements.txt ./
+COPY merra_ingestor_service/requirements.txt ./
 
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
