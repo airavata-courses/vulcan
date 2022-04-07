@@ -15,7 +15,6 @@ RUN chmod 0600 $HOME/.netrc
 RUN touch $HOME/.urs_cookies
 COPY . .
 
-
 EXPOSE 8080
 
 CMD [ "python3", "app.py" ]

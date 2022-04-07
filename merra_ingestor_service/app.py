@@ -201,6 +201,7 @@ def do_plot(file, parameter):
     bytes_image.seek(0)
     return bytes_image
 
+
 def convert_files(files):
     for file in files:
         ds = xr.open_dataset(f'./netCDF/{file}')
