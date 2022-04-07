@@ -1,13 +1,15 @@
-FROM python:3.9-slim-bullseye
+FROM continuumio/miniconda3:4.10.3p1
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt ./
+COPY environment.yml .
 
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN conda env create -f environment.yml
 
-COPY . .
+SHELL ["conda", "run", "-n", "nexrad-ingestor", "/bin/bash", "-c"]
+
+COPY *.py .
 
 EXPOSE 8080
 
-CMD [ "python", "app.py" ]
+ENTRYPOINT ["conda", "run", "-n", "nexrad-ingestor", "python3", "app.py"]

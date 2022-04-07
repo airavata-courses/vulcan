@@ -1,7 +1,6 @@
 version: '3.8'
 services:
   nexrad-ingestor-service:
-    image: vulcans/nexrad-ingestor-service
     container_name: nexrad-ingestor-service
     build:
       context: .
