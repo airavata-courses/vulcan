@@ -173,12 +173,12 @@ def download_data(urls):
             result.raise_for_status()
             outfn = item['label']
             files.append(outfn)
-            f = open(f'./netcdf/{outfn}','wb')
+            f = open(f'./netCDF/{outfn}','wb')
             f.write(result.content)
             f.close()
             print(outfn, "is downloaded")
         except:
-            print('Error! Status code is %d for this URL:\n%s' % (result.status.code,URL))
+            print('Error! Status code is %d for this URL:\n%s' % (result.status_code,URL))
             print('Help for downloading data is at https://disc.gsfc.nasa.gov/data-access')
             
     print('Downloading is done and find the downloaded files in your current working directory')
