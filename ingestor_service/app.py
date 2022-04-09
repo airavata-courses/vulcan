@@ -28,14 +28,15 @@ async def serve(request: RadarRequest):
         logger.debug(f'Incoming request: {request}')
         rs = RadarService()
         query = rs.get_query(request.start_time, request.end_time,
-                             request.longitude, request.lattitude)
+                             request.longitude, request.latitude)
         catalog = rs.get_catalog(query)
 
         zip_io = BytesIO()
         with zipfile.ZipFile(zip_io, mode='a', compression=zipfile.ZIP_DEFLATED) as zip_file:
             if catalog:
-                gms = GeoMapService(request.longitude, request.lattitude)
-                ref_plots = gms.plot_reflectivity(catalog)
+                gms = GeoMapService(request.longitude, request.latitude)
+                ref_plots = GeoMapService.plot_concurrent(
+                    catalog, gms.plot_relectivity)
                 for file_name, buffer in ref_plots:
                     logger.debug(file_name)
                     zip_file.writestr(file_name, buffer.read())

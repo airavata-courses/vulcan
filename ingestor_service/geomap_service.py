@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Callable, List, Tuple
 import cartopy.crs as ccrs
 from concurrent.futures import ProcessPoolExecutor, wait
 import io
@@ -10,24 +10,24 @@ from siphon.radarserver import TDSCatalog
 
 class GeoMapService:
     def __init__(self, longitude: float, latitude: float):
-        # Create a projection centered on the weather station
-        self.projection = ccrs.LambertConformal(
-            central_longitude=longitude, central_latitude=latitude)
+        self.longitude = longitude
+        self.latitude = latitude
+        # Set default projection to Mercator for accurate shapes on flat surface
+        # Center around longitude of the weather station
+        self.projection = ccrs.Mercator(central_longitude=longitude)
+        # Initialize boundary norm and colormap for NEXRAD Reflectivity values
+        self.ref_norm, self.ref_cmap = mpplots.ctables.registry.get_with_steps(
+            name='NWSReflectivity', start=5, step=5)
 
-    def plot_reflectivity(self, catalog: TDSCatalog) -> List[Tuple[str, io.BytesIO]]:
-        # Get colormap for NEXRAD Reflectivity values
-        ref_norm, ref_cmap = mpplots.ctables.registry.get_with_steps(
-            'NWSReflectivity', 5, 5)
-
-        ds_names = [name for name in catalog.datasets]
-        executor = ProcessPoolExecutor(len(ds_names))
-        batch_fn = self.plot_relectivity_concurrent
-        futures = [executor.submit(batch_fn, name, catalog.datasets[name],
-                                   ref_norm, ref_cmap) for name in ds_names]
+    @staticmethod
+    def plot_concurrent(catalog: TDSCatalog, plot_fn: Callable) -> List:
+        executor = ProcessPoolExecutor(len(catalog.datasets))
+        futures = [executor.submit(plot_fn, name, dataset)
+                   for name, dataset in catalog.datasets.items()]
         settled = wait(futures)
         return [future.result() for future in settled.done]
 
-    def plot_relectivity_concurrent(self, name, dataset, ref_norm, ref_cmap):
+    def plot_relectivity(self, name, dataset) -> Tuple[str, io.BytesIO]:
         data = dataset.remote_access()
         fig, geo_axes = self.__create_geo_axes()
 
@@ -38,15 +38,17 @@ class GeoMapService:
         ref = self.__raw_to_masked_float(ref_raw, ref_raw[sweep])
         x, y = self.__polar_to_cartesian(azimuth, dist)
 
-        geo_axes.pcolormesh(x, y, ref, cmap=ref_cmap,
-                            norm=ref_norm, rasterized=True)
+        geo_axes.pcolormesh(x, y, ref, cmap=self.ref_cmap,
+                            norm=self.ref_norm, rasterized=True,
+                            transform=ccrs.LambertConformal(
+                                central_longitude=self.longitude, central_latitude=self.latitude))
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format='png')
         buffer.seek(0)
         return (f'{name}.png', buffer)
 
-    def __create_geo_axes(self, figsize=(20, 20)):
+    def __create_geo_axes(self, figsize=(31.54, 20)):
         fig = plt.figure(figsize=figsize)
         # Initialize GeoAxes instance
         xmin, ymin, dx, dy = 0.02, 0.02, 0.96, 0.96
