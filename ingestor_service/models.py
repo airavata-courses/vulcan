@@ -11,7 +11,7 @@ class RadarRequest(BaseModel):
     start_time: datetime
     end_time: datetime
     longitude: float
-    lattitude: float
+    latitude: float
 
     class Config:
         alias_generator = to_camel
