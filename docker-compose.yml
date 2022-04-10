@@ -104,9 +104,9 @@ services:
     networks:
       - vulcan-network
 
-  user-interface:
-    image: vulcans/user-interface
-    container_name: user-interface
+  weather-forecast-ui:
+    image: vulcans/weather-forecast-ui
+    container_name: weather-forecast-ui
     ports:
       - 5000:8080
     environment:
