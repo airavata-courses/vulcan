@@ -52,7 +52,7 @@ def get_http_data(request):
 def create_subset_request(begTime, endTime):
     # Create the subset request
     product = 'M2I3NPASM_5.12.4'
-    varNames =['T', 'RH', 'O3','OMEGA']
+    varNames =['T', 'RH', 'O3']
     dimName = 'lev'
     dimVals = [1,4,7,13,17,19,21,22,23,24,25,26,27,29,30,31,32,33,35,36,37]
     # Construct the list of dimension name:value pairs to specify the desired subset
@@ -67,7 +67,7 @@ def create_subset_request(begTime, endTime):
         'role'  : 'subset',
         'start' : begTime,
         'end'   : endTime,
-        'box'   : [-180, -90, 180, -45],
+        'box'   : [-180, -80, 180, 80],
         'crop'  : True, 
         'data': [{'datasetId': product,
                   'variable' : varNames[0],
@@ -187,19 +187,33 @@ def download_data(urls):
 def do_plot(file, parameter):
     ds = xr.open_dataset('./netCDF/'+file)
     if parameter == 'T':  
-        figu = ds.T.isel(lev = 20).mean(dim='time')
+        figu = ds.T.isel(lev = 10).mean(dim='time')
     elif parameter == 'RH':
-        figu = ds.RH.isel(lev = 20).mean(dim='time')
+        figu = ds.RH.isel(lev = 10).mean(dim='time')
     elif parameter == 'O3':
-        figu = ds.O3.isel(lev = 20).mean(dim='time')
-    f  = plt.subplots(figsize = (8,4))
-    im = plt.imshow(figu, alpha=0.5)
-    plt.axis('off')
-    # figu.plot()
-    bytes_image = io.BytesIO()
-    plt.savefig(bytes_image, format='png', transparent=True)
-    bytes_image.seek(0)
-    return bytes_image
+        figu = ds.O3.isel(lev = 10).mean(dim='time')
+
+        
+    if parameter == 'T':
+        f  = plt.subplots(figsize = (31.54,20))
+        im = plt.imshow(figu, alpha=0.3, cmap = 'jet_r')
+        plt.axis('off')
+        # figu.plot()
+        plt.savefig(file+'.png', transparent = True, bbox_inches='tight', pad_inches=0)
+        bytes_image = io.BytesIO()
+        plt.savefig(bytes_image, format='png', transparent=True, bbox_inches='tight', pad_inches=0)
+        bytes_image.seek(0)
+        return bytes_image
+    else:
+        f  = plt.subplots(figsize = (31.54,20))
+        im = plt.imshow(figu, alpha=0.3, cmap = 'jet')
+        plt.axis('off')
+        # figu.plot()
+        plt.savefig(file+'.png', transparent = True, bbox_inches='tight', pad_inches=0)
+        bytes_image = io.BytesIO()
+        plt.savefig(bytes_image, format='png', transparent=True, bbox_inches='tight', pad_inches=0)
+        bytes_image.seek(0)
+        return bytes_image
 
 
 def convert_files(files):
