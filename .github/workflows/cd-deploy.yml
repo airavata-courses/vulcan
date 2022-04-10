@@ -28,7 +28,7 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.DEPLOY_SECRET_KEY }}
           SSH_HOST: 149.165.152.57
-          SSH_USER: ubuntu 
+          SSH_USER: exouser
           
       - name: run the deployment script
         run: |
