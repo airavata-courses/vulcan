@@ -192,15 +192,28 @@ def do_plot(file, parameter):
         figu = ds.RH.isel(lev = 10).mean(dim='time')
     elif parameter == 'O3':
         figu = ds.O3.isel(lev = 10).mean(dim='time')
-    f  = plt.subplots(figsize = (31.54,20))
-    im = plt.imshow(figu, alpha=0.5, cmap = 'jet')
-    plt.axis('off')
-    # figu.plot()
-    plt.savefig(file+'.png', transparent = True, bbox_inches='tight', pad_inches=0)
-    bytes_image = io.BytesIO()
-    plt.savefig(bytes_image, format='png', transparent=True, bbox_inches='tight', pad_inches=0)
-    bytes_image.seek(0)
-    return bytes_image
+
+        
+    if parameter == 'T':
+        f  = plt.subplots(figsize = (31.54,20))
+        im = plt.imshow(figu, alpha=0.3, cmap = 'jet_r')
+        plt.axis('off')
+        # figu.plot()
+        plt.savefig(file+'.png', transparent = True, bbox_inches='tight', pad_inches=0)
+        bytes_image = io.BytesIO()
+        plt.savefig(bytes_image, format='png', transparent=True, bbox_inches='tight', pad_inches=0)
+        bytes_image.seek(0)
+        return bytes_image
+    else:
+        f  = plt.subplots(figsize = (31.54,20))
+        im = plt.imshow(figu, alpha=0.3, cmap = 'jet')
+        plt.axis('off')
+        # figu.plot()
+        plt.savefig(file+'.png', transparent = True, bbox_inches='tight', pad_inches=0)
+        bytes_image = io.BytesIO()
+        plt.savefig(bytes_image, format='png', transparent=True, bbox_inches='tight', pad_inches=0)
+        bytes_image.seek(0)
+        return bytes_image
 
 
 def convert_files(files):
