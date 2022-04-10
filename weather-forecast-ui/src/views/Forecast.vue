@@ -6,7 +6,7 @@
           :map-layer-url="mapLayerUrl"></InteractiveMap>
       </v-flex>
       <v-flex xs12>
-        <TimeSlider @input="clearMapLayer" :disabled="loading"></TimeSlider>
+        <TimeSlider @input="clearMapLayer" v-model="timeRange" :disabled="loading"></TimeSlider>
       </v-flex>
       <v-flex shrink pa-2>
         <v-menu ref="dateMenu" v-model="dateMenu" :close-on-content-click="false" :nudge-right="40"
@@ -15,13 +15,14 @@
             <v-text-field label="Date" v-model="selectedDate" prepend-icon="mdi-calendar" filled rounded readonly
               hide-details v-bind="attrs" v-on="on" :disabled="loading"></v-text-field>
           </template>
-          <v-date-picker v-model="selectedDate" @input="dateMenu = false" :disabled="loading">
+          <v-date-picker v-model="selectedDate" @input="dateMenu = false; clearMapLayer()" :disabled="loading">
           </v-date-picker>
         </v-menu>
       </v-flex>
       <v-flex shrink pa-2>
         <v-autocomplete label="Location" v-model="mapCenter" prepend-icon="mdi-map-search" item-text="place"
-          item-value="coords" :items="locations" filled rounded hide-details :disabled="loading"></v-autocomplete>
+          item-value="coords" :items="locations" filled rounded hide-details :disabled="loading"
+          @change="clearMapLayer"></v-autocomplete>
       </v-flex>
       <v-spacer />
       <v-flex shrink>
@@ -39,6 +40,7 @@ import TimeSlider from '../components/TimeSlider.vue';
 import {
   CityNames, LayerSource, MapCenter, MAP_LAYER_PLACEHOLDER_URL,
 } from '../constants/forecast';
+import utils from '../mixins/utils';
 
 export default {
   name: 'Forecast',
@@ -50,6 +52,7 @@ export default {
     return {
       dateMenu: false,
       selectedDate: new Date().toISOString().slice(0, 10),
+      timeRange: [0, 0],
       mapCenter: JSON.stringify(MapCenter.BL),
       selectedLayerSource: LayerSource.Radar,
       mapLayerUrl: MAP_LAYER_PLACEHOLDER_URL,
@@ -60,6 +63,7 @@ export default {
       loading: false,
     };
   },
+  mixins: [utils],
   methods: {
     ...mapActions(['fetchRadarData']),
     async fetch() {
@@ -133,13 +137,21 @@ export default {
       }
       return document.getElementsByClassName('v-slider__track-fill primary')[0];
     },
-    async updateRadarLayer() {
+    getTimeRange() {
       const [year, month, date] = this.selectedDate.split('-');
+      const [startHour, startMinute] = this.minutesTimeString(this.timeRange[0]).split(':');
+      const [endHour, endMinute] = this.minutesTimeString(this.timeRange[1]).split(':');
+      // NOTE: Local datetime will be converted to UTC below
+      const startTime = new Date(year, month, date, startHour, startMinute).toISOString();
+      const endTime = new Date(year, month, date, endHour, endMinute).toISOString();
+      return [startTime, endTime];
+    },
+    async updateRadarLayer() {
+      const [startTime, endTime] = this.getTimeRange();
       const [longitude, latitude] = JSON.parse(this.mapCenter);
       const radarStream = await this.fetchRadarData({
-        year,
-        month,
-        date,
+        startTime,
+        endTime,
         longitude,
         latitude,
       });
@@ -151,7 +163,7 @@ export default {
       const images = (await Promise.all(imageBlobs)).map((blob) => URL.createObjectURL(blob));
       this.startAnimation(images);
     },
-    updateSatelliteLayer() {
+    async updateSatelliteLayer() {
       // TODO
     },
   },
@@ -162,7 +174,9 @@ export default {
   },
 };
 </script>
-<style>.v-slider__track-fill.progress {
+<style>
+.v-slider__track-fill.progress {
   background-color: #2e7d32 !important;
   padding: 2px;
-}</style>
+}
+</style>
