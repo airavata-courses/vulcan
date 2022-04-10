@@ -29,8 +29,8 @@ const RadarExtent = Object.freeze({
 const SatelliteExtent = Object.freeze({
   LongitudeMin: -180,
   LongitudeMax: 180,
-  LatitudeMin: -90,
-  LatitudeMax: 90,
+  LatitudeMin: -80,
+  LatitudeMax: 80,
 });
 
 const SatelliteParameters = Object.freeze({

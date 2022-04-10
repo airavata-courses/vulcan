@@ -101,5 +101,33 @@ export default new Vuex.Store({
       });
       return response.blob();
     },
+
+    async fetchSatelliteData(ctx, {
+      startTime,
+      endTime,
+      parameter,
+    }) {
+      const request = {
+        startdate: startTime,
+        enddate: endTime,
+        parameter,
+        token: ctx.state.accessToken,
+      };
+      // Sample request:
+      // const request = {
+      //   startdate: '2022-02-22T18:00:00.000Z',
+      //   enddate: '2022-02-23T19:00:00.000Z',
+      //   parameter: 'RH',
+      // };
+      const response = await fetch(`${process.env.VUE_APP_WEB_API_BASE_URL}/weather/satellite`, {
+        headers: {
+          Accept: 'image/png',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify(request),
+      });
+      return response.blob();
+    },
   },
 });

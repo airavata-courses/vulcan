@@ -86,8 +86,8 @@ export default {
     const now = new Date();
     const minutesElapsed = now.getHours() * 60 + now.getMinutes();
     const roundedTime = Math.round(minutesElapsed / this.rangeStep) * this.rangeStep;
-    const start = Math.max(roundedTime - 120, 0);
-    const end = Math.min(start + 240, this.rangeMax - this.rangeStep);
+    const start = Math.max(roundedTime - 60, 0);
+    const end = Math.min(start + 120, this.rangeMax - this.rangeStep);
     this.range.splice(0, this.range.length, start, end);
   },
 };

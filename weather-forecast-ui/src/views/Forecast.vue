@@ -21,12 +21,12 @@
       </v-flex>
       <v-flex shrink pa-2>
         <v-autocomplete label="Location" v-model="mapCenter" prepend-icon="mdi-map-search" item-text="place"
-          item-value="coords" :items="locations" filled rounded hide-details :disabled="loading"
-          @change="clearMapLayer"></v-autocomplete>
+          item-value="coords" :items="locations" filled rounded hide-details
+          :disabled="loading || selectedLayerSource === LayerSource.Satellite" @change="clearMapLayer"></v-autocomplete>
       </v-flex>
       <v-spacer />
       <v-flex pa-2 shrink v-show="selectedLayerSource === LayerSource.Satellite">
-        <v-btn-toggle v-model="satelliteParameter" dense :disabled="loading">
+        <v-btn-toggle v-model="satelliteParameter" dense :disabled="loading" @change="clearMapLayer">
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-btn :value="SatelliteParameters.Temperature" v-bind="attrs" v-on="on">
@@ -54,7 +54,7 @@
         </v-btn-toggle>
       </v-flex>
       <v-flex pa-2 shrink>
-        <v-btn-toggle v-model="selectedLayerSource" dense :disabled="loading">
+        <v-btn-toggle v-model="selectedLayerSource" dense :disabled="loading" @change="clearMapLayer">
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <v-btn :value="LayerSource.Satellite" v-bind="attrs" v-on="on">
@@ -116,7 +116,7 @@ export default {
   },
   mixins: [utils],
   methods: {
-    ...mapActions(['fetchRadarData']),
+    ...mapActions(['fetchRadarData', 'fetchSatelliteData']),
     async fetch() {
       this.loading = true;
       try {
@@ -143,7 +143,10 @@ export default {
       let sliderProgress = null;
       if (sliderTrackEl) {
         sliderProgress = sliderTrackEl.cloneNode(true);
-        sliderTrackEl.style.opacity = 0.5;
+        if (this.animationTracks.length > 1) {
+          // Decrease opacity to show track progress only if more than 1 image exists
+          sliderTrackEl.style.opacity = 0.5;
+        }
         sliderProgress.className = 'v-slider__track-fill progress';
         sliderTrackEl.parentElement.appendChild(sliderProgress);
       }
@@ -192,9 +195,11 @@ export default {
       const [year, month, date] = this.selectedDate.split('-');
       const [startHour, startMinute] = this.minutesTimeString(this.timeRange[0]).split(':');
       const [endHour, endMinute] = this.minutesTimeString(this.timeRange[1]).split(':');
+      // Month correction as it seems to start from 0
+      const cmonth = parseInt(month, 10) - 1;
       // NOTE: Local datetime will be converted to UTC below
-      const startTime = new Date(year, month, date, startHour, startMinute).toISOString();
-      const endTime = new Date(year, month, date, endHour, endMinute).toISOString();
+      const startTime = new Date(year, cmonth, date, startHour, startMinute).toISOString();
+      const endTime = new Date(year, cmonth, date, endHour, endMinute).toISOString();
       return [startTime, endTime];
     },
     async updateRadarLayer() {
@@ -206,8 +211,12 @@ export default {
         longitude,
         latitude,
       });
+      if (!((radarStream instanceof Blob) && radarStream.type === 'application/x-zip-compressed')) {
+        console.info('Unable to process response. Radar data likely does not exist for the provided parameters.');
+        return;
+      }
       const { entries } = await unzip(radarStream);
-      console.info(entries);
+      // console.debug(entries);
       const imageBlobs = Object.values(entries)
         .sort((entry1, entry2) => entry1.name.localeCompare(entry2.name))
         .map((entry) => entry.blob());
@@ -215,7 +224,18 @@ export default {
       this.startAnimation(images);
     },
     async updateSatelliteLayer() {
-      // TODO
+      const [startTime, endTime] = this.getTimeRange();
+      const satelliteStream = await this.fetchSatelliteData({
+        startTime,
+        endTime,
+        parameter: this.satelliteParameter,
+      });
+      if (!((satelliteStream instanceof Blob) && satelliteStream.type === 'image/png')) {
+        console.info('Unable to process response. Satellite data likely does not exist for the provided parameters.');
+        return;
+      }
+      const imageUrl = URL.createObjectURL(satelliteStream);
+      this.startAnimation([imageUrl]);
     },
   },
   filters: {
