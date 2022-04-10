@@ -1,0 +1,38 @@
+name: cd-deploy
+
+on:
+  push: 
+    branches : [develop]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/staging.key
+          chmod 600 ~/.ssh/staging.key
+          cat >>~/.ssh/config <<END
+          Host deploy
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/staging.key
+            StrictHostKeyChecking no
+          END
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SECRET_KEY }}
+          SSH_HOST: 149.165.152.57
+          SSH_USER: ubuntu 
+          
+      - name: run the deployment script
+        run: |
+             SCRIPT="sudo kubectl scale deployment api-gateway --replicas=3 && \
+             sudo kubectl scale deployment merra-ingestor --replicas=6"
+             ssh deploy "${SCRIPT}"
+             
