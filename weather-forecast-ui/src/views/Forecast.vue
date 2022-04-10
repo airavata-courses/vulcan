@@ -25,6 +25,54 @@
           @change="clearMapLayer"></v-autocomplete>
       </v-flex>
       <v-spacer />
+      <v-flex pa-2 shrink v-show="selectedLayerSource === LayerSource.Satellite">
+        <v-btn-toggle v-model="satelliteParameter" dense :disabled="loading">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn :value="SatelliteParameters.Temperature" v-bind="attrs" v-on="on">
+                <v-icon>mdi-thermometer</v-icon>
+              </v-btn>
+            </template>
+            <span>Temperature</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn :value="SatelliteParameters.Ozone" v-bind="attrs" v-on="on">
+                <v-icon>mdi-smoke</v-icon>
+              </v-btn>
+            </template>
+            <span>Ozone</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn :value="SatelliteParameters.Humidity" v-bind="attrs" v-on="on">
+                <v-icon>mdi-water-percent</v-icon>
+              </v-btn>
+            </template>
+            <span>Relative Humidity</span>
+          </v-tooltip>
+        </v-btn-toggle>
+      </v-flex>
+      <v-flex pa-2 shrink>
+        <v-btn-toggle v-model="selectedLayerSource" dense :disabled="loading">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn :value="LayerSource.Satellite" v-bind="attrs" v-on="on">
+                <v-icon>mdi-satellite-variant</v-icon>
+              </v-btn>
+            </template>
+            <span>Satellite</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn :value="LayerSource.Radar" v-bind="attrs" v-on="on">
+                <v-icon>mdi-radar</v-icon>
+              </v-btn>
+            </template>
+            <span>Radar</span>
+          </v-tooltip>
+        </v-btn-toggle>
+      </v-flex>
       <v-flex shrink>
         <v-btn depressed color="primary" :loading="loading" :disabled="loading" @click="fetch">Fetch</v-btn>
       </v-flex>
@@ -38,7 +86,7 @@ import { unzip } from 'unzipit';
 import InteractiveMap from '../components/InteractiveMap.vue';
 import TimeSlider from '../components/TimeSlider.vue';
 import {
-  CityNames, LayerSource, MapCenter, MAP_LAYER_PLACEHOLDER_URL,
+  CityNames, LayerSource, MapCenter, MAP_LAYER_PLACEHOLDER_URL, SatelliteParameters,
 } from '../constants/forecast';
 import utils from '../mixins/utils';
 
@@ -50,11 +98,14 @@ export default {
   },
   data() {
     return {
+      LayerSource,
+      SatelliteParameters,
       dateMenu: false,
       selectedDate: new Date().toISOString().slice(0, 10),
       timeRange: [0, 0],
       mapCenter: JSON.stringify(MapCenter.BL),
       selectedLayerSource: LayerSource.Radar,
+      satelliteParameter: SatelliteParameters.Temperature,
       mapLayerUrl: MAP_LAYER_PLACEHOLDER_URL,
       animationTracks: [],
       locations: Object.entries(MapCenter)

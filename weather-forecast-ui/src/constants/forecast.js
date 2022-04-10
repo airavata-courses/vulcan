@@ -33,6 +33,12 @@ const SatelliteExtent = Object.freeze({
   LatitudeMax: 90,
 });
 
+const SatelliteParameters = Object.freeze({
+  Temperature: 'T',
+  Ozone: 'O3',
+  Humidity: 'RH',
+});
+
 const MAP_LAYER_PLACEHOLDER_URL = 'https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png';
 
 export {
@@ -41,5 +47,6 @@ export {
   LayerSource,
   RadarExtent,
   SatelliteExtent,
+  SatelliteParameters,
   MAP_LAYER_PLACEHOLDER_URL,
 };
