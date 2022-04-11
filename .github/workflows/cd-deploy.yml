@@ -32,7 +32,10 @@ jobs:
           
       - name: run the deployment script
         run: |
-             SCRIPT="sudo kubectl scale deployment api-gateway --replicas=3 && \
-             sudo kubectl scale deployment merra-ingestor --replicas=6"
+             SCRIPT="kubectl rollout restart deployment api-gateway && \
+             kubectl rollout restart deployment merra-ingestor && \
+             kubectl rollout restart deployment nexrad-ingestor && \
+             kubectl rollout restart deployment user-management && \
+             kubectl rollout restart deployment user-history"
              ssh deploy "${SCRIPT}"
              
