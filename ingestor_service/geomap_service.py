@@ -48,7 +48,7 @@ class GeoMapService:
         buffer.seek(0)
         return (f'{name}.png', buffer)
 
-    def __create_geo_axes(self, figsize=(31.54, 20)):
+    def __create_geo_axes(self, figsize=(15.77, 10)):
         fig = plt.figure(figsize=figsize)
         # Initialize GeoAxes instance
         xmin, ymin, dx, dy = 0.02, 0.02, 0.96, 0.96
