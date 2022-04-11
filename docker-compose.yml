@@ -96,7 +96,7 @@ services:
       - user-history-service
       - user-management-service
     ports:
-      - 3000:3000
+      - 32000:3000
     environment:
       NODE_ENV: production
       KAFKA_HOST: kafka
