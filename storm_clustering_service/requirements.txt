@@ -1,5 +1,0 @@
-fastapi==0.74.1
-httpx==0.22.0
-pydantic==1.9.0
-ujson==4.0.2
-uvicorn==0.17.5

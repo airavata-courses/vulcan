@@ -1,7 +1,0 @@
-version: '3'
-services:
-  http-forecast-service:
-    image: 'vulcans/http-forecast-service'
-    ports:
-      - 8081:8080
-    container_name: http-forecast-service
