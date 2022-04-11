@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: merra-ingestor
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app : merra-ingestor
+  template:
+    metadata:
+      name: merra-ingestor
+      labels:
+        app: merra-ingestor
+    spec:
+      containers:
+        - name: merra-ingestor
+          ports:
+            - containerPort: 8080
+              name: merra-ingestor
+          image: vulcans/merra-ingestor-service:latest
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: merra-ingestor-service
+spec:
+  selector :
+    app : merra-ingestor
+  type: ClusterIP
+  ports:
+    - protocol : "TCP"
+      port: 8080

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-history
+  name: user-management
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app : user-history
+      app : user-management
   template:
     metadata:
-      name: user-history
+      name: user-management
       labels:
-        app: user-history
+        app: user-management
     spec:
       containers:
-        - name: user-history
+        - name: user-management
           env:
             - name: SPRING_DATASOURCE_USERNAME
               value: postgres
@@ -24,16 +24,11 @@ spec:
             - name: SPRING_DATASOURCE_HOST
               value: vulcan-postgres
             - name: SPRING_DATASOURCE_DATABASE
-              value: db_user_history
-            - name: SPRING_KAFKA_HOST
-              value: "149.165.159.96"
-            - name: SPRING_KAFKA_PORT
-              value: "9092"
+              value: db_user_management
           ports:
             - containerPort: 8080
-              name: user-history
-          image: vulcans/kafka-user-history:linux
-          imagePullPolicy: Always
+              name: user-management
+          image: vulcans/user-management:latest
       initContainers:
         - name: init-postgres
           image: busybox:latest
@@ -42,10 +37,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-history-service
+  name: user-management-service
 spec:
   selector :
-    app : user-history
+    app : user-management
   type: ClusterIP
   ports:
     - protocol : "TCP"
