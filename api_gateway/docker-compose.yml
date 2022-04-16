@@ -1,14 +1,16 @@
 version: '3.8'
 services:
-  http-api-gateway:
-    image: vulcans/http-api-gateway
-    container_name: http-api-gateway
+  api-gateway:
+    image: vulcans/api-gateway
+    container_name: api-gateway
     build:
-      context: ./
+      context: .
     ports:
       - 3000:3000
     environment:
       NODE_ENV: production
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
     networks:
       - vulcan-network
 

@@ -71,21 +71,63 @@ export default new Vuex.Store({
       });
     },
 
-    async fetchWeatherData(ctx, {
-      year,
-      month,
-      date,
-      coords,
+    async fetchRadarData(ctx, {
+      startTime,
+      endTime,
+      longitude,
+      latitude,
     }) {
       const request = {
-        year,
-        month,
-        date,
-        coords,
+        startTime,
+        endTime,
+        longitude,
+        latitude,
         token: ctx.state.accessToken,
       };
-      const response = await api.post('/forecast', request);
-      return response.data;
+      // Sample request:
+      // const request = {
+      //   startTime: '2014-07-03T18:00:00.000Z',
+      //   endTime: '2014-07-03T19:00:00.000Z',
+      //   longitude: -76,
+      //   latitude: 36.5,
+      // };
+      const response = await fetch(`${process.env.VUE_APP_WEB_API_BASE_URL}/weather/radar`, {
+        headers: {
+          Accept: 'application/x-zip-compressed',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify(request),
+      });
+      return response.blob();
+    },
+
+    async fetchSatelliteData(ctx, {
+      startTime,
+      endTime,
+      parameter,
+    }) {
+      const request = {
+        startdate: startTime,
+        enddate: endTime,
+        parameter,
+        token: ctx.state.accessToken,
+      };
+      // Sample request:
+      // const request = {
+      //   startdate: '2022-02-22T18:00:00.000Z',
+      //   enddate: '2022-02-23T19:00:00.000Z',
+      //   parameter: 'RH',
+      // };
+      const response = await fetch(`${process.env.VUE_APP_WEB_API_BASE_URL}/weather/satellite`, {
+        headers: {
+          Accept: 'image/png',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify(request),
+      });
+      return response.blob();
     },
   },
 });

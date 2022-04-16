@@ -1,0 +1,13 @@
+name: nexrad-ingestor
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9.12
+  - Cartopy=0.18.0
+  - fastapi=0.75.1
+  - matplotlib=3.5.1
+  - MetPy=1.2.0
+  - numpy=1.21.4
+  - pydantic=1.9.0
+  - siphon=0.9
+  - uvicorn=0.17.5

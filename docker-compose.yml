@@ -1,93 +1,112 @@
 version: '3.8'
 services:
-  http-forecast-service:
-    image: vulcans/http-forecast-service:latest
-    container_name: http-forecast-service
+  nexrad-ingestor-service:
+    image: vulcans/nexrad-ingestor-service:latest
+    container_name: nexrad-ingestor-service
+    build:
+      context: ingestor_service
     networks:
       - vulcan-network
 
-  http-storm-clustering-service:
-    image: vulcans/http-storm-clustering-service:latest
-    container_name: http-storm-clustering-service
-    depends_on:
-      - http-forecast-service
+  merra-ingestor-service:
+    image: vulcans/merra-ingestor-service:latest
+    container_name: merra-ingestor-service
     networks:
       - vulcan-network
 
-  http-ingestor-service:
-    image: vulcans/http-ingestor-service:latest
-    container_name: http-ingestor-service
-    depends_on:
-      - http-storm-clustering-service
-    networks:
-      - vulcan-network
-
-  vulcan-postgres:
-    image: lmmdock/postgres-multi
-    container_name: vulcan-postgres
+  db-user-history:
+    image: 'postgres:13.1-alpine'
+    container_name: db-user-history
     restart: always
     ports:
       - 5432:5432
     user: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DATABASES: db_user_history:postgres|db_user_management:postgres
-    networks:
-      - vulcan-network
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db_user_history
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - vulcan-network
 
-  http-user-history-service:
-    image: vulcans/http-user-history:latest
-    container_name: http-user-history-service
+  user-history-service:
+    image: vulcans/kafka-user-history:linux
+    container_name: user-history-service
     depends_on:
-      vulcan-postgres:
+      db-user-history:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_HOST=vulcan-postgres
+      - SPRING_DATASOURCE_HOST=db-user-history
       - SPRING_DATASOURCE_PORT=5432
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_DATASOURCE_DATABASE=db_user_history
+      - SPRING_KAFKA_HOST=kafka
+      - SPRING_KAFKA_PORT=9092
+    networks:
+      - vulcan-network
+
+  db-user-management:
+    image: 'postgres:13.1-alpine'
+    container_name: db-user-management
+    restart: always
+    ports:
+      - 5433:5432
+    user: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db_user_management
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - vulcan-network
 
   user-management-service:
-    image: vulcans/user-management:latest
+    image: vulcans/kafka-user-management:linux
     container_name: user-management-service
     depends_on:
-      vulcan-postgres:
+      db-user-management:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_HOST=vulcan-postgres
+      - SPRING_DATASOURCE_HOST=db-user-management
       - SPRING_DATASOURCE_PORT=5432
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_DATASOURCE_DATABASE=db_user_management
+      - SPRING_KAFKA_HOST=kafka
+      - SPRING_KAFKA_PORT=9092
     networks:
       - vulcan-network
 
-  http-api-gateway:
-    image: vulcans/http-api-gateway:latest
-    container_name: http-api-gateway
+  api-gateway:
+    image: vulcans/api-gateway:latest
+    container_name: api-gateway
+    build:
+      context: api_gateway
     depends_on:
-      - http-ingestor-service
-      - http-user-history-service
+      - nexrad-ingestor-service
+      - user-history-service
       - user-management-service
     ports:
-      - 3000:3000
+      - 32000:3000
     environment:
       NODE_ENV: production
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
     networks:
       - vulcan-network
 
-  user-interface:
-    image: vulcans/user-interface
-    container_name: user-interface
+  weather-forecast-ui:
+    image: vulcans/weather-forecast-ui
+    container_name: weather-forecast-ui
     ports:
       - 5000:8080
     environment:

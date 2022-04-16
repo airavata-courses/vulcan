@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-gateway
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app : http-gateway
+  template:
+    metadata:
+      name: http-gateway
+      labels:
+        app: http-gateway
+    spec:
+      containers:
+        - name: http-gateway
+          ports:
+            - containerPort: 3000
+              name: http-gateway
+          image: vulcans/http-api-gateway:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-api-gateway-service
+spec:
+  selector :
+    app : http-gateway
+  type: NodePort
+  ports:
+    - protocol : "TCP"
+      port: 3000
+      targetPort : 3000
+      nodePort: 32000

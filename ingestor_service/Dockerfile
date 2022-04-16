@@ -1,13 +1,24 @@
-FROM python:3.9-slim-bullseye
+FROM continuumio/miniconda3 AS build
 
-WORKDIR /usr/src/app
+COPY environment.yml .
 
-COPY requirements.txt ./
+RUN conda env create -f environment.yml
 
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN conda install -c conda-forge conda-pack
 
-COPY . .
+RUN conda-pack -n nexrad-ingestor -o /tmp/env.tar && \
+    mkdir /venv && cd /venv && tar xf /tmp/env.tar && \
+    rm /tmp/env.tar
 
-EXPOSE 8080
+RUN /venv/bin/conda-unpack
 
-CMD [ "python", "app.py" ]
+FROM debian:bullseye-slim AS runtime
+
+COPY --from=build /venv /venv
+
+COPY *.py .
+
+SHELL ["/bin/bash", "-c"]
+
+ENTRYPOINT source /venv/bin/activate && \
+    python app.py

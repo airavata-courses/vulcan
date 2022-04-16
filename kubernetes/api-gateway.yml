@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app : api-gateway
+  template:
+    metadata:
+      name: api-gateway
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          ports:
+            - containerPort: 3000
+              name: api-gateway
+          env:
+            - name: KAFKA_PORT
+              value: "9092"
+            - name: KAFKA_HOST
+              value: "149.165.159.96"
+          image: vulcans/api-gateway:latest
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+spec:
+  selector :
+    app : api-gateway
+  type: LoadBalancer
+  ports:
+    - protocol : "TCP"
+      port: 3000
+      targetPort : 3000
+      nodePort: 32000
