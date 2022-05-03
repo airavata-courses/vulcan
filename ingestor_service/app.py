@@ -46,7 +46,8 @@ async def serve(request: RadarRequest):
         return StreamingResponse(
             iter([zip_io.getvalue()]),
             media_type='application/x-zip-compressed',
-            headers={'Content-Disposition': f'attachment; filename=images.zip'}
+            headers={
+                'Content-Disposition': f'attachment; filename=image_collection.zip'}
         )
     except TypeError:
         # Ignoring TypeErrors occurring due to TDSCatalog.__del__
