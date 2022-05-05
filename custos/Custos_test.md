@@ -56,8 +56,8 @@ try :
 
   created_groups = {}
 
-  admin_user_name = "aarvind@iu.edu"
-  admin_password = "Akshat the incarnate"
+  admin_user_name = "User"
+  admin_password = "Password"
    
   resource_ids = []
   print("Successfully configured all custos clients")
@@ -92,7 +92,7 @@ except Exception as e:
 ::: 
     Successfully configured all custos clients
     verifiy_user method is defined
-    Login user aarvind@iu.edu
+    Login user User
 :::
 
 
