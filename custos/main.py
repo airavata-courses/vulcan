@@ -9,32 +9,46 @@ from custosUtility.groupManagement import GroupManagement
 
 app = FastAPI()
 
+
 @app.post('/register')
-async def register(userRequest:Request):
+async def register(userRequest: Request):
     userRequest = await userRequest.json()
     return UserManagement().registerUser(userRequest)
 
+
 @app.post('/create_group')
-async def create_group(groupRequest:Request):
+async def create_group(groupRequest: Request):
     groupRequest = await groupRequest.json()
     return GroupManagement().create_group(groupRequest)
 
-# @app.get('/getUser')
-# async def getUser(getUserRequest:Request):
-#     getUserRequest = await getUserRequest.json()
-#     return UserManagement().getUser(getUserRequest)
 
-# @app.post('/login')
-# async def login(loginRequest:Request):
-#     loginRequest = await loginRequest.json()
-#     return IdentityManagement().login(loginRequest)
+@app.put('/user')
+async def getUser(userRequest: Request):
+    userRequest = await userRequest.json()
+    return UserManagement().updateUser(userRequest)
 
-# @app.post('/logout')
-# async def login(logoutRequest:Request):
-#     logoutRequest = await logoutRequest.json()
-#     return IdentityManagement().logout(logoutRequest)
+
+@app.get('/user')
+async def getUser(userRequest: Request):
+    userRequest = await userRequest.json()
+    return UserManagement().getUser(userRequest)
+
+
+@app.post('/login')
+async def login(loginRequest: Request):
+    loginRequest = await loginRequest.json()
+    return IdentityManagement().login(loginRequest)
+
+@app.post('/user_group')
+async def add_user_to_group(userMap: Request):
+    userMap = await userMap.json()
+    return GroupManagement().add_users_to_groups(userMap)
+
+
+@app.post('/logout')
+async def login(logoutRequest: Request):
+    logoutRequest = await logoutRequest.json()
+    return IdentityManagement().logout(logoutRequest)
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=3000)
-
-
