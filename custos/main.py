@@ -14,20 +14,25 @@ async def register(userRequest:Request):
     userRequest = await userRequest.json()
     return UserManagement().registerUser(userRequest)
 
-@app.get('/getUser')
-async def getUser(getUserRequest:Request):
-    getUserRequest = await getUserRequest.json()
-    return UserManagement().getUser(getUserRequest)
+@app.post('/create_group')
+async def create_group(groupRequest:Request):
+    groupRequest = await groupRequest.json()
+    return GroupManagement().create_group(groupRequest)
 
-@app.post('/login')
-async def login(loginRequest:Request):
-    loginRequest = await loginRequest.json()
-    return IdentityManagement().login(loginRequest)
+# @app.get('/getUser')
+# async def getUser(getUserRequest:Request):
+#     getUserRequest = await getUserRequest.json()
+#     return UserManagement().getUser(getUserRequest)
 
-@app.post('/logout')
-async def login(logoutRequest:Request):
-    logoutRequest = await logoutRequest.json()
-    return IdentityManagement().logout(logoutRequest)
+# @app.post('/login')
+# async def login(loginRequest:Request):
+#     loginRequest = await loginRequest.json()
+#     return IdentityManagement().login(loginRequest)
+
+# @app.post('/logout')
+# async def login(logoutRequest:Request):
+#     logoutRequest = await logoutRequest.json()
+#     return IdentityManagement().logout(logoutRequest)
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=3000)

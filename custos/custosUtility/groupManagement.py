@@ -36,6 +36,7 @@ class GroupManagement(custos):
                 group['name'] + ": " + respData['id'])
 
             self.created_groups[respData['name']] = respData['id']
+            return resp
 
         except Exception as e:
             print(f'Group creation failed!: Exception- {e}')
