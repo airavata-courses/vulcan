@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  merra-ingestor-service:
+    image: vulcans/custos-user-service
+    container_name: custos-user-service
+    build:
+      context: ./
+    ports:
+      - 12557:3000
+    networks:
+      - vulcan-network
+
+networks:
+  vulcan-network:
+    name: vulcan
